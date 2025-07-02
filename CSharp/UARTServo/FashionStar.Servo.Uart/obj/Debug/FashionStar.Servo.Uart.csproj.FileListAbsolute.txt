@@ -1,0 +1,12 @@
+D:\code\UARTServo\FashionStar.Servo.Uart\bin\Debug\FashionStar.Servo.Uart.dll
+D:\code\UARTServo\FashionStar.Servo.Uart\bin\Debug\FashionStar.Servo.Uart.pdb
+D:\code\UARTServo\FashionStar.Servo.Uart\obj\Debug\FashionStar.Servo.Uart.csprojAssemblyReference.cache
+D:\code\UARTServo\FashionStar.Servo.Uart\obj\Debug\FashionStar.Servo.Uart.csproj.CoreCompileInputs.cache
+D:\code\UARTServo\FashionStar.Servo.Uart\obj\Debug\FashionStar.Servo.Uart.dll
+D:\code\UARTServo\FashionStar.Servo.Uart\obj\Debug\FashionStar.Servo.Uart.pdb
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\FashionStar.Servo.Uart\bin\Debug\FashionStar.Servo.Uart.dll
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\FashionStar.Servo.Uart\bin\Debug\FashionStar.Servo.Uart.pdb
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\FashionStar.Servo.Uart\obj\Debug\FashionStar.Servo.Uart.csproj.AssemblyReference.cache
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\FashionStar.Servo.Uart\obj\Debug\FashionStar.Servo.Uart.csproj.CoreCompileInputs.cache
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\FashionStar.Servo.Uart\obj\Debug\FashionStar.Servo.Uart.dll
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\FashionStar.Servo.Uart\obj\Debug\FashionStar.Servo.Uart.pdb

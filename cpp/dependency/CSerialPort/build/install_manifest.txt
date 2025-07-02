@@ -1,0 +1,13 @@
+/usr/local/include/CSerialPort/osplatformutil.h
+/usr/local/include/CSerialPort/SerialPortBase.h
+/usr/local/include/CSerialPort/SerialPortInfoBase.h
+/usr/local/include/CSerialPort/SerialPortInfoUnixBase.h
+/usr/local/include/CSerialPort/sigslot.h
+/usr/local/include/CSerialPort/SerialPortInfoWinBase.h
+/usr/local/include/CSerialPort/SerialPortWinBase.h
+/usr/local/include/CSerialPort/SerialPortInfo.h
+/usr/local/include/CSerialPort/SerialPort_global.h
+/usr/local/include/CSerialPort/SerialPort.h
+/usr/local/include/CSerialPort/SerialPortUnixBase.h
+/usr/local/lib/libcserialport.so
+/usr/local/lib/cmake/CSerialPort/cserialport-config.cmake

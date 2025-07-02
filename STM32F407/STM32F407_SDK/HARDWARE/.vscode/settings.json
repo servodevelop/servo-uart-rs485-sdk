@@ -1,0 +1,6 @@
+{
+	"files.associations": {
+		"fashion_star_uart_servo_examples.h": "c",
+		"usart.h": "c"
+	}
+}

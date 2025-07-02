@@ -1,0 +1,13 @@
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\bin\Release\UARTServoDemo.exe.config
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\bin\Release\UARTServoDemo.exe
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\bin\Release\UARTServoDemo.pdb
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\bin\Release\FashionStar.Servo.Uart.dll
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\bin\Release\FashionStar.Servo.Uart.pdb
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\obj\Release\UARTServoDemo.csproj.AssemblyReference.cache
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\obj\Release\UARTServoDemo.MainForm.resources
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\obj\Release\UARTServoDemo.Properties.Resources.resources
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\obj\Release\UARTServoDemo.csproj.GenerateResource.cache
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\obj\Release\UARTServoDemo.csproj.CoreCompileInputs.cache
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\obj\Release\UARTServ.4D958756.Up2Date
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\obj\Release\UARTServoDemo.exe
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\obj\Release\UARTServoDemo.pdb

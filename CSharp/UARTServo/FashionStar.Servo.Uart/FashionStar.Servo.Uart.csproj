@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F2B948CF-DF4F-4CDD-B7AC-B96BFE0CE8DC}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FashionStar.Servo.Uart</RootNamespace>
+    <AssemblyName>FashionStar.Servo.Uart</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;VS_IDE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Base\ByteBuffer.cs" />
+    <Compile Include="Base\ByteExtension.cs" />
+    <Compile Include="Base\DataEventArgs.cs" />
+    <Compile Include="Base\Logging\DebugLogProvider.cs" />
+    <Compile Include="Base\Logging\FileLogProvider.cs" />
+    <Compile Include="Base\Logging\ILogProvider.cs" />
+    <Compile Include="Base\Logging\LogDebugGroup.cs" />
+    <Compile Include="Base\Logging\Logger.cs" />
+    <Compile Include="Base\Logging\LogLevel.cs" />
+    <Compile Include="Base\MemberInfoExtension.cs" />
+    <Compile Include="Base\PacketConverterEx.cs" />
+    <Compile Include="Base\PacketFieldAttribute.cs" />
+    <Compile Include="Base\PacketSerializableAttribute.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Protocol\BasicData.cs" />
+    <Compile Include="Protocol\BoardPowerControlRequest.cs" />
+    <Compile Include="Protocol\DataConst.cs" />
+    <Compile Include="Protocol\MoveOnAngleModeExByIntervalRequest.cs" />
+    <Compile Include="Protocol\MoveOnAngleModeExByIntervalResponse.cs" />
+    <Compile Include="Protocol\MoveOnAngleModeExByVelocityRequest.cs" />
+    <Compile Include="Protocol\MoveOnAngleModeExByVelocityResponse.cs" />
+    <Compile Include="Protocol\MoveOnAngleModeRequest.cs" />
+    <Compile Include="Protocol\MoveOnAngleModeResponse.cs" />
+    <Compile Include="Protocol\MoveOnDampingModeRequest.cs" />
+    <Compile Include="Protocol\MoveOnDampingModeResponse.cs" />
+    <Compile Include="Protocol\MoveOnMultiTurnAngleModeExByIntervalRequest.cs" />
+    <Compile Include="Protocol\MoveOnMultiTurnAngleModeExByIntervalResponse.cs" />
+    <Compile Include="Protocol\MoveOnMultiTurnAngleModeExByVelocityRequest.cs" />
+    <Compile Include="Protocol\MoveOnMultiTurnAngleModeExByVelocityResponse.cs" />
+    <Compile Include="Protocol\MoveOnMultiTurnAngleModeRequest.cs" />
+    <Compile Include="Protocol\MoveOnMultiTurnAngleModeResponse.cs" />
+    <Compile Include="Protocol\MoveOnWheelModeRequest.cs" />
+    <Compile Include="Protocol\MoveOnWheelModeResponse.cs" />
+    <Compile Include="Protocol\PacketConst.cs" />
+    <Compile Include="Protocol\PingRequest.cs" />
+    <Compile Include="Protocol\PingResponse.cs" />
+    <Compile Include="Protocol\ReadAngleRequest.cs" />
+    <Compile Include="Protocol\ReadAngleResponse.cs" />
+    <Compile Include="Protocol\ReadBatchDataRequest.cs" />
+    <Compile Include="Protocol\ReadBatchDataResponse.cs" />
+    <Compile Include="Protocol\ReadDataRequest.cs" />
+    <Compile Include="Protocol\ReadDataResponse.cs" />
+    <Compile Include="Protocol\ReadMultiTurnAngleRequest.cs" />
+    <Compile Include="Protocol\ReadMultiTurnAngleResponse.cs" />
+    <Compile Include="Protocol\RequestHeader.cs" />
+    <Compile Include="Protocol\ResetMultiTurnAngleRequest.cs" />
+    <Compile Include="Protocol\ResetMultiTurnAngleResponse.cs" />
+    <Compile Include="Protocol\ResetUserDataRequest.cs" />
+    <Compile Include="Protocol\ResetUserDataResponse.cs" />
+    <Compile Include="Protocol\ResponseHeader.cs" />
+    <Compile Include="Protocol\SetOriginPointRequest.cs" />
+    <Compile Include="Protocol\SetOriginPointResponse.cs" />
+    <Compile Include="Protocol\TransmissionModeSettingRequest.cs" />
+    <Compile Include="Protocol\UserData.cs" />
+    <Compile Include="Protocol\WriteBatchDataRequest.cs" />
+    <Compile Include="Protocol\WriteBatchDataResponse.cs" />
+    <Compile Include="Protocol\WriteDataRequest.cs" />
+    <Compile Include="Protocol\WriteDataResponse.cs" />
+    <Compile Include="Serial\ISerialPortManager.cs" />
+    <Compile Include="Serial\SerialDataEventArgs.cs" />
+    <Compile Include="Serial\SerialPortManager.cs" />
+    <Compile Include="Serial\SerialSettings.cs" />
+    <Compile Include="ServoController.cs" />
+    <Compile Include="ServoController.Rx.cs" />
+    <Compile Include="ServoController.Tx.cs" />
+    <Compile Include="TemperatureConverter.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

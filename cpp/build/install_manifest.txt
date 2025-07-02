@@ -1,0 +1,3 @@
+/usr/local/lib/libfsuartservo.so
+/usr/local/include/FashionStar/UServo/FashionStar_UartServoProtocol.h
+/usr/local/include/FashionStar/UServo/FashionStar_UartServo.h

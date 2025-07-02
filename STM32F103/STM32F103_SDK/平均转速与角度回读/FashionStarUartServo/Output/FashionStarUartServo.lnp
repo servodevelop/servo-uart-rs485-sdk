@@ -1,0 +1,23 @@
+--cpu Cortex-M3
+"..\output\main.o"
+"..\output\usart.o"
+"..\output\ring_buffer.o"
+"..\output\sys_tick.o"
+"..\output\fashion_star_uart_servo.o"
+"..\output\misc.o"
+"..\output\stm32f10x_dbgmcu.o"
+"..\output\stm32f10x_dma.o"
+"..\output\stm32f10x_exti.o"
+"..\output\stm32f10x_flash.o"
+"..\output\stm32f10x_gpio.o"
+"..\output\stm32f10x_i2c.o"
+"..\output\stm32f10x_rcc.o"
+"..\output\stm32f10x_rtc.o"
+"..\output\stm32f10x_tim.o"
+"..\output\stm32f10x_usart.o"
+"..\output\gpio_stm32f10x.o"
+"..\output\startup_stm32f10x_md.o"
+"..\output\system_stm32f10x.o"
+--library_type=microlib --ro-base 0x08000000 --entry 0x08000000 --rw-base 0x20000000 --entry Reset_Handler --first __Vectors --strict --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "..\Listings\FashionStarUartServo.map" -o ..\Output\FashionStarUartServo.axf

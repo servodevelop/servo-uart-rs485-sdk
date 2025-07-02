@@ -1,0 +1,17 @@
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\bin\Debug\UARTServoDemo.exe.config
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\bin\Debug\UARTServoDemo.exe.manifest
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\bin\Debug\UARTServoDemo.application
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\bin\Debug\UARTServoDemo.exe
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\bin\Debug\UARTServoDemo.pdb
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\bin\Debug\FashionStar.Servo.Uart.dll
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\bin\Debug\FashionStar.Servo.Uart.pdb
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\obj\Debug\UARTServoDemo.csproj.AssemblyReference.cache
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\obj\Debug\UARTServoDemo.MainForm.resources
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\obj\Debug\UARTServoDemo.Properties.Resources.resources
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\obj\Debug\UARTServoDemo.csproj.GenerateResource.cache
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\obj\Debug\UARTServoDemo.csproj.CoreCompileInputs.cache
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\obj\Debug\UARTServoDemo.exe.manifest
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\obj\Debug\UARTServoDemo.application
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\obj\Debug\UARTServ.4D958756.Up2Date
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\obj\Debug\UARTServoDemo.exe
+D:\fashionstar-uart-servo-csharp-sdk\fashionstar-uart-servo-csharp-sdk\uart-servo-csharp-sdk\UARTServo\UARTServoDemo\obj\Debug\UARTServoDemo.pdb

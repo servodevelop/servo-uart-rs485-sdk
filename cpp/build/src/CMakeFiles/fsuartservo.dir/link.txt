@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC   -shared -Wl,-soname,libfsuartservo.so -o ../lib/libfsuartservo.so CMakeFiles/fsuartservo.dir/FashionStar_UartServoProtocol.cpp.o CMakeFiles/fsuartservo.dir/FashionStar_UartServo.cpp.o   -L/usr/local/bin  -Wl,-rpath,/usr/local/bin: -lcserialport 

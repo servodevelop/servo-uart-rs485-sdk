@@ -1,0 +1,6 @@
+D:\code\UARTServo\FashionStar.Servo\obj\Debug\FashionStar.Servo.csprojAssemblyReference.cache
+D:\code\UARTServo\FashionStar.Servo\obj\Debug\FashionStar.Servo.csproj.CoreCompileInputs.cache
+D:\code\UARTServo\FashionStar.Servo\bin\Debug\FashionStar.Servo.dll
+D:\code\UARTServo\FashionStar.Servo\bin\Debug\FashionStar.Servo.pdb
+D:\code\UARTServo\FashionStar.Servo\obj\Debug\FashionStar.Servo.dll
+D:\code\UARTServo\FashionStar.Servo\obj\Debug\FashionStar.Servo.pdb
