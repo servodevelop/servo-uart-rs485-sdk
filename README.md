@@ -14,7 +14,7 @@
 
 ### 仓库说明
 
-该仓库包括华馨京科技 uart/485 系列舵机的所有常见编程语言的SDK例程。
+该仓库包括华馨京科技 uart&rs485 系列舵机的所有常见编程语言的SDK例程。
 
 通信协议以及更多资料请参考： [Fashion Star Wiki](https://wiki.fashionrobo.com/)
 
