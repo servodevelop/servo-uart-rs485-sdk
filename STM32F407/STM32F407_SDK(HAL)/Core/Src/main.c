@@ -91,7 +91,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  User_Uart_Init(&huart2);  // 初始化串�?2作为舵机控制的端口，注意 本例程中串口1已经作为调试打印端口使用�? 
+  User_Uart_Init(&huart2);  // 初始化串�?2作为舵机控制的端口，注意 本例程中串口1已经作为调试打印端口使用�? 
   /* USER CODE END 2 */
 
   /* Infinite loop */
