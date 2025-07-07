@@ -321,7 +321,6 @@ statusCode = FSUS_Ping(servoUsart, servoId);
 #define FSUS_STATUS_SIZE_TOO_BIG 5 // 参数的size大于FSUS_PACK_RESPONSE_MAX_SIZE里面的限制
 #define FSUS_STATUS_CHECKSUM_ERROR 6 // 校验和错误
 #define FSUS_STATUS_ID_NOT_MATCH 7 // 请求的舵机ID跟反馈回来的舵机ID不匹配
-#define FSUS_STATUS_ERRO 8 // 设置同步模式错误
 ```
 
 ### 4.2.例程-检测舵机是否在线
@@ -427,7 +426,7 @@ int main (void)
 **函数原型**
 
 ```c
-FSUS_STATUS FSUS_SetServoAngle(Usart_DataTypeDef *usart, uint8_t servo_id, float angle, uint16_t interval, uint16_t power);
+FSUS_STATUS FSUS_SetServoAngle(Usart_DataTypeDef *usart, uint8_t servo_id, float angle, uint16_t interval, uint16_t power, uint8_t wait);
 ```
 
 * `usart` 舵机控制对应的串口数据对象`Usart_DataTypeDef`
@@ -435,6 +434,7 @@ FSUS_STATUS FSUS_SetServoAngle(Usart_DataTypeDef *usart, uint8_t servo_id, float
 * `angle` 舵机的目标角度，最小单位 0.1°，取值范围 [-180.0, 180.0] 
 * `interval` 舵机的运行时间，单位ms，最小值 > 100
 * `power` 舵机执行功率，单位mV，默认为0
+* `wait` API是否为阻塞式；`0`：不阻塞，`1`：等待舵机旋转到特定的位置
 
 **使用示例**
 
@@ -444,9 +444,10 @@ FSUS_STATUS FSUS_SetServoAngle(Usart_DataTypeDef *usart, uint8_t servo_id, float
 uint8_t servoId = 0;  // 舵机的ID号
 float angle = 0;// 舵机的目标角度  舵机角度在-180度到180度之间, 最小单位0.1°
 uint16_t interval = 2000; // 运行时间ms  可以尝试修改设置更小的运行时间，例如500ms
-uint16_t power = 0; // 舵机执行功率 单位mV 默认为0    
+uint16_t power = 0; // 舵机执行功率 单位mV 默认为0   
+uint8_t wait = 0; //  API是否为阻塞式，0:不等待 1:等待舵机旋转到特定的位置; 
 
-FSUS_SetServoAngle(servoUsart, servoId, angle, interval, power);
+FSUS_SetServoAngle(servoUsart, servoId, angle, interval, power, wait);
 ```
 
 
@@ -460,7 +461,7 @@ FSUS_SetServoAngle(servoUsart, servoId, angle, interval, power);
 ```c
 FSUS_STATUS FSUS_SetServoAngleByInterval(Usart_DataTypeDef *usart, uint8_t servo_id, \
                 float angle, uint16_t interval, uint16_t t_acc, \
-                uint16_t t_dec, uint16_t  power);
+                uint16_t t_dec, uint16_t  power, uint8_t wait);
 ```
 
 
@@ -478,6 +479,8 @@ FSUS_STATUS FSUS_SetServoAngleByInterval(Usart_DataTypeDef *usart, uint8_t servo
 * `t_dec` 舵机接近目标角度时的减速时间，单位ms，最小值 > 20
 
 * `power` 舵机执行功率，单位mV，默认为0
+
+* `wait` API是否为阻塞式；`0`：不阻塞，`1`：等待舵机旋转到特定的位置
 
   
 
@@ -499,8 +502,10 @@ uint16_t t_acc = 100;
 uint16_t t_dec = 150;
 // 舵机执行功率 单位mV 默认为0   
 uint16_t power = 0;
+ //  API是否为阻塞式，0:不等待 1:等待舵机旋转到特定的位置; 
+uint8_t wait = 0; 
 
-FSUS_SetServoAngleByInterval(servo_usart, servo_id, angle, interval, t_acc, t_dec, power);
+FSUS_SetServoAngleByInterval(servo_usart, servo_id, angle, interval, t_acc, t_dec, power, wait);
 ```
 
 
@@ -514,7 +519,7 @@ FSUS_SetServoAngleByInterval(servo_usart, servo_id, angle, interval, t_acc, t_de
 ```c
 FSUS_STATUS FSUS_SetServoAngleByVelocity(Usart_DataTypeDef *usart, uint8_t servo_id, \
                 float angle, float velocity, uint16_t t_acc, \
-                uint16_t t_dec, uint16_t  power);
+                uint16_t t_dec, uint16_t  power, uint8_t wait);
 ```
 
 * `usart` 舵机控制对应的串口数据对象`Usart_DataTypeDef`
@@ -524,6 +529,9 @@ FSUS_STATUS FSUS_SetServoAngleByVelocity(Usart_DataTypeDef *usart, uint8_t servo
 * `t_acc` 舵机启动到匀速的时间，单位ms，最小值 > 20
 * `t_dec` 舵机接近目标角度时的减速时间，单位ms，最小值 > 20
 * `power` 舵机执行功率，单位mV，默认为0
+* `wait` API是否为阻塞式；`0`：不阻塞，`1`：等待舵机旋转到特定的位置
+
+
 
 **使用示例**
 
@@ -542,8 +550,10 @@ uint16_t t_acc = 100;
 uint16_t t_dec = 150;
 // 舵机执行功率 单位mV 默认为0   
 uint16_t power = 0;
+ //  API是否为阻塞式，0:不等待 1:等待舵机旋转到特定的位置; 
+uint8_t wait = 0; 
 
-FSUS_SetServoAngleByVelocity(servo_usart, servo_id, angle, velocity, t_acc, t_dec, power);
+FSUS_SetServoAngleByVelocity(servo_usart, servo_id, angle, velocity, t_acc, t_dec, power, wait);
 ```
 
 
@@ -560,6 +570,8 @@ FSUS_STATUS FSUS_QueryServoAngle(Usart_DataTypeDef *usart, uint8_t servo_id, flo
 * `usart` 舵机控制对应的串口数据对象`Usart_DataTypeDef`
 * `servo_id` 舵机的ID
 * `angle` 舵机当前的角度存放指针
+
+
 
 **使用示例**
 
@@ -645,6 +657,9 @@ uint16_t t_acc;
 uint16_t t_dec;
 // 舵机执行功率 单位mV 默认为0   
 uint16_t power = 0;
+// 设置舵机角度的时候, 是否为阻塞式 
+// 0:不等待 1:等待舵机旋转到特定的位置; 
+uint8_t wait = 1; 
 // 读取的角度
 float angle_read;
 
@@ -660,12 +675,12 @@ int main (void)
         // 简易角度控制 + 当前角度查询
         angle = 135.0;
         interval = 2000;
-        FSUS_SetServoAngle(servo_usart, servo_id, angle, interval, power);
+        FSUS_SetServoAngle(servo_usart, servo_id, angle, interval, power, wait);
         FSUS_QueryServoAngle(servo_usart, servo_id, &angle_read);
         printf("Cur Angle: %.1f\r\n", angle_read);
         
-        // 等待2.5s
-        SysTick_DelayMs(2500);
+        // 等待2s
+        SysTick_DelayMs(2000);
         
         // 带加减速的角度控制(指定周期) + 当前角度查询
         printf("GOTO+Interval: 0.0f\r\n");
@@ -673,7 +688,7 @@ int main (void)
         interval = 1000;
         t_acc = 100;
         t_dec = 150;
-        FSUS_SetServoAngleByInterval(servo_usart, servo_id, angle, interval, t_acc, t_dec, power);
+        FSUS_SetServoAngleByInterval(servo_usart, servo_id, angle, interval, t_acc, t_dec, power, wait);
         FSUS_QueryServoAngle(servo_usart, servo_id, &angle_read);
         printf("Cur Angle: %.1f\r\n", angle_read);
         
@@ -686,12 +701,9 @@ int main (void)
         velocity = 200.0f;
         t_acc = 100;
         t_dec = 150;
-        FSUS_SetServoAngleByVelocity(servo_usart, servo_id, angle, velocity, t_acc, t_dec, power);
+        FSUS_SetServoAngleByVelocity(servo_usart, servo_id, angle, velocity, t_acc, t_dec, power, wait);
         FSUS_QueryServoAngle(servo_usart, servo_id, &angle_read);
         printf("Cur Angle: %.1f\r\n", angle_read);
-        
-        // 等待3s
-        SysTick_DelayMs(3000);
   }
 }
 
@@ -741,30 +753,15 @@ Cur Angle: -134.6
 // 设置完成之后, 将下行取消注释
 Usart_DataTypeDef* servoUsart = &usart1; 
 
-// 使用串口2作为日志输出的端口
-// <接线说明>
-// STM32F103 PA2(Tx) <----> USB转TTL Rx
-// STM32F103 PA3(Rx) <----> USB转TTL Tx
-// STM32F103 GND     <----> USB转TTL GND
-// STM32F103 V5      <----> USB转TTL 5V (可选)
-Usart_DataTypeDef* logging_usart = &usart2;
-
-// 重定向c库函数printf到串口，重定向后可使用printf函数
-int fputc(int ch, FILE *f)
-{
-    while((logging_usart->pUSARTx->SR&0X40)==0){}
-    /* 发送一个字节数据到串口 */
-    USART_SendData(logging_usart->pUSARTx, (uint8_t) ch);
-    /* 等待发送完毕 */
-    // while (USART_GetFlagStatus(USART1, USART_FLAG_TC) != SET);       
-    return (ch);
-}
 //// 舵机控制相关的参数
 // 运行时间ms  
 // 可以尝试修改设置更小的运行时间，例如500ms
 uint16_t interval = 2000; 
 // 舵机执行功率 单位mV 默认为0   
 uint16_t power = 0;
+// 设置舵机角度的时候, 是否为阻塞式 
+// 0:不等待 1:等待舵机旋转到特定的位置; 
+uint8_t wait = 0; 
 
 int main (void)
 {
@@ -776,8 +773,8 @@ int main (void)
     while (1)
     {   
         // 简易角度控制指令，控制0和1号舵机
-        FSUS_SetServoAngle(servoUsart, 0, 135.0, interval, power);
-        FSUS_SetServoAngle(servoUsart, 1, 45.0, interval, power);
+        FSUS_SetServoAngle(servoUsart, 0, 135.0, interval, power, wait);
+        FSUS_SetServoAngle(servoUsart, 1, 45.0, interval, power, wait);
         // 等待动作完成
         SysTick_DelayMs(interval);
         
@@ -785,8 +782,8 @@ int main (void)
         SysTick_DelayMs(2000);
         
         // 简易角度控制指令，控制0和1号舵机
-        FSUS_SetServoAngle(servoUsart, 0, -135.0, interval, power);
-        FSUS_SetServoAngle(servoUsart, 1, -45.0, interval, power);
+        FSUS_SetServoAngle(servoUsart, 0, -135.0, interval, power, wait);
+        FSUS_SetServoAngle(servoUsart, 1, -45.0, interval, power, wait);
         // 等待动作完成
         SysTick_DelayMs(interval);
         
@@ -859,6 +856,9 @@ float nextAngle = 0;    // 舵机的目标角度
 uint16_t speed = 200;   // 舵机的转速 单位 °/s
 uint16_t interval = 0;  // 舵机旋转的周期
 uint16_t power = 0;     // 舵机执行功率 单位mV 默认为0
+uint8_t wait = 0;       // 0:不等待 1:等待舵机旋转到特定的位置;
+// 舵机角度死区, 如果舵机当前角度跟
+// 目标角度相差小于死区则代表舵机到达目标角度, 舵机不再旋转
 // <注意事项>
 //      死区跟舵机的型号有关系, 取决于舵机固件的设置, 不同型号的舵机会有差别
 float servoDeadBlock = 1.0; 
@@ -911,7 +911,7 @@ int main (void)
         interval = calcIntervalMs(servoId, nextAngle, speed);
         printf("Set Servo %f-> %f", curAngle, nextAngle);
         // 控制舵机角度
-        FSUS_SetServoAngle(servoUsart, servoId, nextAngle, interval, power);
+        FSUS_SetServoAngle(servoUsart, servoId, nextAngle, interval, power, wait);
         // SysTick_DelayMs(interval);
         SysTick_DelayMs(5);
         waitUntilServoIDLE(servoId, nextAngle);
@@ -928,7 +928,7 @@ int main (void)
         // 根据转速还有角度误差计算周期
         interval = calcIntervalMs(servoId, nextAngle, speed);
         // 控制舵机角度
-        FSUS_SetServoAngle(servoUsart, servoId, nextAngle, interval, power);
+        FSUS_SetServoAngle(servoUsart, servoId, nextAngle, interval, power, wait);
         // 需要延时一会儿，确保舵机接收并开始执行舵机控制指令
         // 如果马上发送舵机角度查询信息,新发送的这条指令可能会覆盖舵机角度控制信息
         SysTick_DelayMs(5);
@@ -965,7 +965,8 @@ int main (void)
 **函数原型**
 
 ```c
-FSUS_STATUS FSUS_SetServoAngleMTurn(Usart_DataTypeDef *usart, uint8_t servo_id, float angle, uint32_t interval, uint16_t power);
+FSUS_STATUS FSUS_SetServoAngleMTurn(Usart_DataTypeDef *usart, uint8_t servo_id, float angle, \
+			uint32_t interval, uint16_t power, uint8_t wait);
 ```
 
 * `usart` 舵机控制对应的串口数据对象`Usart_DataTypeDef`
@@ -973,6 +974,7 @@ FSUS_STATUS FSUS_SetServoAngleMTurn(Usart_DataTypeDef *usart, uint8_t servo_id, 
 * `angle` 舵机的目标角度，最小单位 0.1°，取值范围 [-368,640.0° ,  368,640.0°]
 * `interval` 舵机的运行时间，单位ms，最小值 > 100
 * `power` 舵机执行功率，单位mV，默认为0
+* `wait` API是否为阻塞式；`0`：不阻塞，`1`：等待舵机旋转到特定的位置
 
 
 
@@ -987,8 +989,10 @@ float angle= 720.0f;
 uint32_t interval = 2000; 	// 运行时间ms  
 // 舵机执行功率，单位mV，默认为0	
 uint16_t power = 0;
+ //  API是否为阻塞式，0:不等待 1:等待舵机旋转到特定的位置; 
+uint8_t wait = 0; 
 
-FSUS_SetServoAngleMTurn(servo_usart, servo_id, angle, interval, power);
+FSUS_SetServoAngleMTurn(servo_usart, servo_id, angle, interval, power, wait);
 ```
 
 
@@ -1000,7 +1004,7 @@ FSUS_SetServoAngleMTurn(servo_usart, servo_id, angle, interval, power);
 
 ```c
 FSUS_STATUS FSUS_SetServoAngleMTurnByInterval(Usart_DataTypeDef *usart, uint8_t servo_id, float angle, \
-			uint32_t interval,  uint16_t t_acc,  uint16_t t_dec, uint16_t power);
+			uint32_t interval,  uint16_t t_acc,  uint16_t t_dec, uint16_t power, uint8_t wait);
 ```
 
 * `usart` 舵机控制对应的串口数据对象`Usart_DataTypeDef`
@@ -1010,6 +1014,7 @@ FSUS_STATUS FSUS_SetServoAngleMTurnByInterval(Usart_DataTypeDef *usart, uint8_t 
 * `t_acc` 舵机启动到匀速的时间，单位ms，最小值 > 20
 * `t_dec` 舵机接近目标角度时的减速时间，单位ms，最小值 > 20
 * `power` 舵机执行功率，单位mV，默认为0
+* `wait` API是否为阻塞式；`0`：不阻塞，`1`：等待舵机旋转到特定的位置
 
 **使用示例**
 
@@ -1022,12 +1027,14 @@ float angle= 720.0f;
 uint32_t interval = 2000; 	// 运行时间ms  
 // 舵机执行功率，单位mV，默认为0	
 uint16_t power = 0;
+ //  API是否为阻塞式，0:不等待 1:等待舵机旋转到特定的位置; 
+uint8_t wait = 1; 
 // 加速时间(单位ms)
 uint16_t t_acc = 100;
 // 减速时间
 uint16_t t_dec = 200;
 
-FSUS_SetServoAngleMTurnByInterval(servo_usart, servo_id, angle, interval, t_acc, t_dec, power);
+FSUS_SetServoAngleMTurnByInterval(servo_usart, servo_id, angle, interval, t_acc, t_dec, power, wait);
 ```
 
 
@@ -1040,7 +1047,7 @@ FSUS_SetServoAngleMTurnByInterval(servo_usart, servo_id, angle, interval, t_acc,
 
 ```c
 FSUS_STATUS FSUS_SetServoAngleMTurnByVelocity(Usart_DataTypeDef *usart, uint8_t servo_id, float angle, \
-			float velocity, uint16_t t_acc,  uint16_t t_dec, uint16_t power);
+			float velocity, uint16_t t_acc,  uint16_t t_dec, uint16_t power, uint8_t wait);
 ```
 
 * `usart` 舵机控制对应的串口数据对象`Usart_DataTypeDef`
@@ -1050,6 +1057,7 @@ FSUS_STATUS FSUS_SetServoAngleMTurnByVelocity(Usart_DataTypeDef *usart, uint8_t 
 * `t_acc` 舵机启动到匀速的时间，单位ms，最小值 > 20
 * `t_dec` 舵机接近目标角度时的减速时间，单位ms，最小值 > 20
 * `power` 舵机执行功率，单位mV，默认为0
+* `wait` API是否为阻塞式；`0`：不阻塞，`1`：等待舵机旋转到特定的位置
 
 **使用示例**
 
@@ -1062,12 +1070,14 @@ float angle= 720.0f;
 float velocity = 100.0f;	// 电机转速, 单位dps,°/s 
 // 舵机执行功率，单位mV，默认为0	
 uint16_t power = 0;
+ //  API是否为阻塞式，0:不等待 1:等待舵机旋转到特定的位置; 
+uint8_t wait = 1; 
 // 加速时间(单位ms)
 uint16_t t_acc = 100;
 // 减速时间
 uint16_t t_dec = 200;
 
-FSUS_SetServoAngleMTurnByVelocity(servo_usart, servo_id, angle, velocity, t_acc, t_dec, power);
+FSUS_SetServoAngleMTurnByVelocity(servo_usart, servo_id, angle, velocity, t_acc, t_dec, power, wait);
 ```
 
 
@@ -1200,6 +1210,9 @@ uint32_t interval; 	// 运行时间ms
 float velocity; 		// 电机转速, 单位dps,°/s
 // 舵机执行功率 单位mV，默认为0	
 uint16_t power = 0;
+// 设置舵机角度的时候, 是否为阻塞式 
+// 0:不等待 1:等待舵机旋转到特定的位置; 
+uint8_t wait = 1; 
 // 加速时间(单位ms)
 uint16_t t_acc;
 // 减速时间
@@ -1219,22 +1232,22 @@ int main (void)
 		//简易多圈角度控制 + 当前多圈角度查询
 		angle = 720.0f;
 		interval = 2000;
-		FSUS_SetServoAngleMTurn(servo_usart, servo_id, angle, interval, power);
+		FSUS_SetServoAngleMTurn(servo_usart, servo_id, angle, interval, power, wait);
 		FSUS_QueryServoAngleMTurn(servo_usart, servo_id, &angle_read);
 		printf("Cur Angle: %.1f\r\n", angle_read);
 		
-		// 等待4s
-		SysTick_DelayMs(4000);
+		// 等待2s
+		SysTick_DelayMs(2000);
 		
 		
 		printf("MTurn GOTO: 0.0f\r\n");
 		angle = 0.0;
-		FSUS_SetServoAngleMTurn(servo_usart, servo_id, angle, interval, power);
+		FSUS_SetServoAngleMTurn(servo_usart, servo_id, angle, interval, power, wait);
 		FSUS_QueryServoAngleMTurn(servo_usart, servo_id, &angle_read);
 		printf("Cur Angle: %.1f\r\n", angle_read);
 		
-		// 等待3s
-		SysTick_DelayMs(3000);
+		// 等待2s
+		SysTick_DelayMs(2000);
 		
 		
 		//带加减速的多圈角度控制(指定周期) + 当前多圈角度查询
@@ -1243,7 +1256,7 @@ int main (void)
 		interval = 1000;
 		t_acc = 100;
 		t_dec = 200;
-		FSUS_SetServoAngleMTurnByInterval(servo_usart, servo_id, angle, interval, t_acc, t_dec, power);
+		FSUS_SetServoAngleMTurnByInterval(servo_usart, servo_id, angle, interval, t_acc, t_dec, power, wait);
 		FSUS_QueryServoAngleMTurn(servo_usart, servo_id, &angle_read);
 		printf("Cur Angle: %.1f\r\n", angle_read);
 		
@@ -1256,12 +1269,12 @@ int main (void)
 		velocity = 100.0f;
 		t_acc = 100;
 		t_dec = 200;
-		FSUS_SetServoAngleMTurnByVelocity(servo_usart, servo_id, angle, velocity, t_acc, t_dec, power);
+		FSUS_SetServoAngleMTurnByVelocity(servo_usart, servo_id, angle, velocity, t_acc, t_dec, power, wait);
 		FSUS_QueryServoAngleMTurn(servo_usart, servo_id, &angle_read);
 		printf("Cur Angle: %.1f\r\n", angle_read);
 		
-		// 等待4s
-		SysTick_DelayMs(4000);
+		// 等待2s
+		SysTick_DelayMs(2000);
 		
   }
 }
@@ -1460,65 +1473,96 @@ int main (void)
 
 
 
-## 8.舵机同步命令
+## 8.舵机轮式模式
 
 
 
-### 8.1.同步命令控制舵机
+### 8.1.定速持续旋转
 
 **函数原型**
 
 ```c
-FSUS_STATUS FSUS_SyncCommand(Usart_DataTypeDef *usart, uint8_t servo_count, uint8_t ServoMode, FSUS_sync_servo servoSync[])；
+// 轮式模式 不停的旋转
+FSUS_STATUS FSUS_WheelKeepMove(Usart_DataTypeDef *usart, uint8_t servoId, uint8_t is_cw, uint16_t speed);
 ```
 
 * `usart` 舵机控制对应的串口数据对象`Usart_DataTypeDef`
-* `servo_count` 舵机同步数量
-* `servomode` 同步命令模式选择
-  
-* `servoSync[]` 舵机控制参数结构体
+* `servoId` 舵机的ID
+* `is_cw` 是否顺时针旋转；`0`：否，逆时针旋转，`1`：是，顺时针旋转
+* `speed` 舵机旋转速度，单位 °/s
 
 **使用示例**
 
 ```c
-/*同步命令模式选择
-* 1：设置舵机的角度
-* 2：设置舵机的角度(指定周期)
-* 3：设置舵机的角度(指定转速)
-* 4：设置舵机的角度(多圈模式)
-* 5：设置舵机的角度(多圈模式, 指定周期) 
-* 6：设置舵机的角度(多圈模式, 指定转速)
-* 7：读取舵机的数据*/
-uint8_t sync_mode=1;//同步命令模式
-
-uint8_t sync_count=5;//舵机数量
-
-//数组定义在#include "fashion_star_uart_servo.c" 
-FSUS_sync_servo SyncArray[20]; // 假设您要控制20个伺服同步
-ServoData servodata[20];//假设您要读取20个伺服舵机的数据
-
-//如需更改舵机数量在#include "fashion_star_uart_servo.h"对应修改extern
-extern FSUS_sync_servo SyncArray[20]; // 假设您要控制20个伺服同步
-extern ServoData servodata[20];//假设您要读取20个伺服舵机的数据
-
-servoSyncArray[0].angle=90;/*角度*/
-servoSyncArray[0].id=0;/*舵机ID号*/
-servoSyncArray[0].velocity=100;/*速度*/				 servoSyncArray[0].interval_single=1000;/*单圈时间*/	servoSyncArray[0].interval_multi=1000; /*多圈时间*/		servoSyncArray[0].t_acc=100;/*加速时间*/    
-servoSyncArray[0].t_dec=100;/*减速时间*/				servoSyncArray[0].power=100;/*功率*/
-/*********************************以此类推赋值剩下舵机参数 灵活性高**************************************/
-
-FSUS_SyncCommand(servo_usart, servo_count, servomode, servoSyncArray);
+uint8_t servoId = 0; 	// 连接在转接板上的总线伺服舵机ID号
+uint16_t speed = 20; 	// 舵机的旋转速度 20°/s
+uint8_t is_cw = 0; 		// 舵机的旋转方向
+FSUS_WheelKeepMove(servoUsart, servoId, is_cw, speed);
 ```
 
 
 
-### 8.2.例程-同步命令
+### 8.2.旋转特定的时间
+
+**函数原型**
+
+```c
+// 轮式模式 按照特定的速度旋转特定的时间
+FSUS_STATUS FSUS_WheelMoveTime(Usart_DataTypeDef *usart, uint8_t servoId, uint8_t is_cw, uint16_t speed, uint16_t nTime);
+```
+
+* `usart` 舵机控制对应的串口数据对象`Usart_DataTypeDef`
+* `servoId` 舵机的ID
+* `is_cw` 是否顺时针旋转；`0`：否，逆时针旋转，`1`：是，顺时针旋转
+* `speed` 舵机旋转速度，单位 °/s
+* `nTime` 舵机持续旋转的时间，单位ms。
+
+**使用示例**
+
+```c
+uint8_t servoId = 0; 	// 连接在转接板上的总线伺服舵机ID号
+uint16_t speed = 20; 	// 舵机的旋转速度 20°/s
+uint8_t is_cw = 0; 		// 舵机的旋转方向
+uint16_t nTime = 3000; 	// 延时时间
+FSUS_WheelMoveTime(servoUsart, servoId, is_cw, speed, nTime);
+```
+
+
+
+### 8.3.旋转特定的圈数
+
+**函数原型**
+
+```c
+// 轮式模式 旋转特定的圈数
+FSUS_STATUS FSUS_WheelMoveNCircle(Usart_DataTypeDef *usart, uint8_t servoId, uint8_t is_cw, uint16_t speed, uint16_t nCircle);
+```
+
+* `usart` 舵机控制对应的串口数据对象`Usart_DataTypeDef`
+* `servoId` 舵机的ID
+* `is_cw` 是否顺时针旋转；`0`：否，逆时针旋转，`1`：是，顺时针旋转
+* `speed` 舵机旋转的速度，单位 °/s
+* `nCircle` 舵机持续旋转的圈数，单位：圈
+
+**使用示例**
+
+```c
+uint8_t servoId = 0; 	// 连接在转接板上的总线伺服舵机ID号
+uint16_t speed = 200; 	// 舵机的旋转速度 单位°/s
+uint8_t is_cw = 0; 		// 舵机的旋转方向
+uint16_t nCircle = 1; 	// 舵机旋转的圈数
+FSUS_WheelMoveNCircle(servoUsart, servoId, is_cw, speed, nCircle);
+```
+
+
+
+### 8.4.例程-舵机持续旋转
 
 
 
 **功能简介**
 
-同时控制所有舵机，实时性高
+测试舵机360度定速持续旋转
 
 
 
@@ -1541,131 +1585,60 @@ FSUS_SyncCommand(servo_usart, servo_count, servomode, servoSyncArray);
 // 设置完成之后, 将下行取消注释
 Usart_DataTypeDef* servoUsart = &usart1; 
 
-// 使用串口2作为日志输出的端口
-// <接线说明>
-// STM32F103 PA2(Tx) <----> USB转TTL Rx
-// STM32F103 PA3(Rx) <----> USB转TTL Tx
-// STM32F103 GND     <----> USB转TTL GND
-// STM32F103 V5      <----> USB转TTL 5V (可选)
-Usart_DataTypeDef* logging_usart = &usart2;
-
-
-
-// 重定向c库函数printf到串口，重定向后可使用printf函数
-int fputc(int ch, FILE *f)
-{
-    while((logging_usart->pUSARTx->SR&0X40)==0){}
-    /* 发送一个字节数据到串口 */
-    USART_SendData(logging_usart->pUSARTx, (uint8_t) ch);
-    /* 等待发送完毕 */
-    // while (USART_GetFlagStatus(USART1, USART_FLAG_TC) != SET);       
-    return (ch);
-}
-
-/*同步命令模式选择
-* 1：设置舵机的角度
-* 2：设置舵机的角度(指定周期)
-* 3：设置舵机的角度(指定转速)
-* 4：设置舵机的角度(多圈模式)
-* 5：设置舵机的角度(多圈模式, 指定周期) 
-* 6：设置舵机的角度(多圈模式, 指定转速)
-* 7：读取舵机的数据*/
-uint8_t servomode=1;//自行更改数值设置模式
-
-//舵机数量，如果id不是从0开始，请把参数设置为最大舵机id号
-uint8_t servo_count=5;
-
+FSUS_STATUS statusCode; // 请求包的状态码
+uint8_t servoId = 0; 	// 连接在转接板上的总线伺服舵机ID号
+uint16_t speed = 20; 	// 舵机的旋转速度 20°/s
+uint8_t is_cw = 0; 		// 舵机的旋转方向
 int main (void)
 {
-    // 嘀嗒定时器初始化
-    SysTick_Init();
-    // 串口初始化
-    Usart_Init();
-
-    while (1){
-			
-   	SyncArray[0].angle=90;
-		SyncArray[0].id=0;SyncArray[0].interval_single=100;SyncArray[0].interval_multi=1000;SyncArray[0].velocity=100;SyncArray[0].t_acc=20;SyncArray[0].t_dec=20;
-		SyncArray[1].angle=-90;
-		SyncArray[1].id=1;SyncArray[1].interval_single=100;SyncArray[1].interval_multi=1000;SyncArray[1].velocity=100;SyncArray[1].t_acc=20;SyncArray[1].t_dec=20;
-		SyncArray[2].angle=90;
-		SyncArray[2].id=2;SyncArray[2].interval_single=100;SyncArray[2].interval_multi=1000;SyncArray[2].velocity=100;SyncArray[2].t_acc=20;SyncArray[2].t_dec=20;
-		SyncArray[3].angle=-90;
-		SyncArray[3].id=3;SyncArray[3].interval_single=100;SyncArray[3].interval_multi=1000;SyncArray[3].velocity=100;SyncArray[3].t_acc=20;SyncArray[3].t_dec=20;
-		SyncArray[4].angle=-90;
-		SyncArray[4].id=4;SyncArray[4].interval_single=100;SyncArray[4].interval_multi=1000;SyncArray[4].velocity=100;SyncArray[4].t_acc=20;SyncArray[4].t_dec=20;
-		//发送同步命令控制
-		FSUS_SyncCommand(servo_usart,sync_count,sync_mode,SyncArray);
+	// 嘀嗒定时器初始化
+	SysTick_Init();
+	// 串口初始化
+	Usart_Init();
+	
+	while (1){
+		// 舵机轮式模式定速控制 顺时针旋转3s
+		is_cw = 1;
+		FSUS_WheelKeepMove(servoUsart, servoId, is_cw, speed);
+		SysTick_DelayMs(3000);
+		
+		// 舵机刹车 停顿2s 
+		FSUS_WheelStop(servoUsart, servoId);
 		SysTick_DelayMs(1000);
-		//发送同步命令读取
-		FSUS_SyncCommand(servo_usart,sync_count,7,SyncArray);
-		SysTick_DelayMs(200);
-
-		SyncArray[0].angle=45;SyncArray[0].interval_single=0;SyncArray[0].velocity=20;
-		SyncArray[1].angle=-45;SyncArray[1].interval_single=0;SyncArray[1].velocity=20;
-		SyncArray[2].angle=45;SyncArray[2].interval_single=0;SyncArray[2].velocity=20;
-		SyncArray[3].angle=-45;SyncArray[3].interval_single=0;SyncArray[3].velocity=20;
-		SyncArray[4].angle=-45;SyncArray[4].interval_single=0;SyncArray[4].velocity=20;
-		//发送同步命令控制
-		FSUS_SyncCommand(servo_usart,sync_count,sync_mode,SyncArray);
+		
+		// 舵机轮式模式定速控制 逆时针旋转3s
+		is_cw = 0;
+		FSUS_WheelKeepMove(servoUsart, servoId, is_cw, speed);
+		SysTick_DelayMs(3000);
+		
+		// 舵机刹车 停顿2s 
+		FSUS_WheelStop(servoUsart, servoId);
 		SysTick_DelayMs(1000);
-		//发送同步命令读取
-		FSUS_SyncCommand(servo_usart,sync_count,7,SyncArray);
-		SysTick_DelayMs(200);
-  }
+	}
 }
-
 ```
 
 
 
-### 
-
-## 9.舵机数据监控
-
-
-
-### 9.1.读取舵机数据
-
-**函数原型**
-
-```c
-FSUS_STATUS FSUS_ServoMonitor(Usart_DataTypeDef *usart, uint8_t servo_id, ServoData servodata[]);
-```
-
-* `usart` 舵机控制对应的串口数据对象`Usart_DataTypeDef`
-* `servo_id` 舵机的ID
-* `servodata[]` 舵机的存储数据结构体
-
-**使用示例**
-
-```c
-//要读取的舵机id号
-uint8_t servoId = 0; 
-//舵机的存储数据结构体
-ServoData servodata_single[1];
-// 读取舵机数据函数
-FSUS_ServoMonitor(servo_usart,servo_id,servodata_single);
-```
-
-
-
-### 9.2.例程-舵机数据监控
+### 8.5.例程-舵机定时旋转
 
 
 
 **功能简介**
 
-读取舵机的所有参数
+测试舵机定时旋转，顺时针旋转3s，然后逆时针旋转3s。
 
 
 
 **源代码**
 
 ```c
-/********************************************************
- * 测试舵机的数据回读，并通过串口打印全部数据
- ********************************************************/
+/***************************************************
+ * 轮式控制模式 定时旋转
+ * <注意事项>
+ * 	  在测试本例程时, 请确保舵机没有机械结构/接线的约束, 
+ * 	  舵机可以360度旋转
+ ***************************************************/
 #include "stm32f10x.h"
 #include "usart.h"
 #include "sys_tick.h"
@@ -1673,85 +1646,135 @@ FSUS_ServoMonitor(servo_usart,servo_id,servodata_single);
 
 // 使用串口1作为舵机控制的端口
 // <接线说明>
-// STM32F103 PA9(Tx)    <----> 总线伺服舵机转接板 Rx
-// STM32F103 PA10(Rx)   <----> 总线伺服舵机转接板 Tx
-// STM32F103 GND        <----> 总线伺服舵机转接板 GND
-// STM32F103 V5         <----> 总线伺服舵机转接板 5V
+// STM32F103 PA9(Tx)  <----> 总线伺服舵机转接板 Rx
+// STM32F103 PA10(Rx) <----> 总线伺服舵机转接板 Tx
+// STM32F103 GND 	  <----> 总线伺服舵机转接板 GND
+// STM32F103 V5 	  <----> 总线伺服舵机转接板 5V
 // <注意事项>
 // 使用前确保已设置usart.h里面的USART1_ENABLE为1
-Usart_DataTypeDef* servo_usart = &usart1; 
+// 设置完成之后, 将下行取消注释
+Usart_DataTypeDef* servoUsart = &usart1; 
 
-// 使用串口2作为日志输出的端口
-// <接线说明>
-// STM32F103 PA2(Tx) <----> USB转TTL Rx
-// STM32F103 PA3(Rx) <----> USB转TTL Tx
-// STM32F103 GND     <----> USB转TTL GND
-// STM32F103 V5      <----> USB转TTL 5V (可选)
-Usart_DataTypeDef* logging_usart = &usart2;
-
-
-
-// 重定向c库函数printf到串口，重定向后可使用printf函数
-int fputc(int ch, FILE *f)
-{
-    while((logging_usart->pUSARTx->SR&0X40)==0){}
-    /* 发送一个字节数据到串口 */
-    USART_SendData(logging_usart->pUSARTx, (uint8_t) ch);
-    /* 等待发送完毕 */
-    // while (USART_GetFlagStatus(USART1, USART_FLAG_TC) != SET);       
-    return (ch);
-}
-
-/*数据监控的数据
-* id：舵机的id号
-* voltage：舵机的电压
-* current：舵机的电流
-* power：舵机的执行功率
-* temperature：舵机的温度 
-* status：舵机的状态
-* angle：舵机的角度
-* circle_count：舵机的转动圈数
-*/
-ServoData servodata_single[1];//读取一个舵机数据的结构体
-
-//要读取的舵机id号
-uint8_t servo_id=0;
-
+FSUS_STATUS statusCode; // 请求包的状态码
+uint8_t servoId = 0; 	// 连接在转接板上的总线伺服舵机ID号
+uint16_t speed = 20; 	// 舵机的旋转速度 20°/s
+uint8_t is_cw = 0; 		// 舵机的旋转方向
+uint16_t nTime = 3000; 	// 延时时间
 int main (void)
 {
-    // 嘀嗒定时器初始化
-    SysTick_Init();
-    // 串口初始化
-    Usart_Init();
-    while (1){
-        	//每1秒读取一次
-			FSUS_DampingMode(servo_usart,servo_id,500);
-			FSUS_ServoMonitor(servo_usart,servo_id,servodata_single);
-			printf("read ID: %d\r\n", servodata_single[0].id);
-			printf("read sucess, voltage: %d mV\r\n", servodata_single[0].voltage);
-			printf("read sucess, current: %d mA\r\n", servodata_single[0].current);
-			printf("read sucess, power: %d mW\r\n", servodata_single[0].power);
-			printf("read sucess, temperature: %d \r\n", servodata_single[0].temperature);
-			if ((servodata_single[0].status >> 3) & 0x01)
-			printf("read sucess, voltage too high\r\n");
-			if ((servodata_single[0].status >> 4) & 0x01)
-			printf("read sucess, voltage too low\r\n");
-			printf("read sucess, angle: %f\r\n", servodata_single[0].angle);
-			printf("read sucess, circle_count: %d\r\n",servodata_single[0].circle_count);
-			SysTick_DelayMs(1000);
-			
-  }
+	// 嘀嗒定时器初始化
+	SysTick_Init();
+	// 串口初始化
+	Usart_Init();
+	
+	while (1){
+		// 舵机轮式模式定速控制 顺时针旋转3s
+		is_cw = 1;
+		FSUS_WheelMoveTime(servoUsart, servoId, is_cw, speed, nTime);
+		// FSUS_WheelMoveTime是非阻塞的,因为有时候需要控制多个舵机同时旋转
+		// 所以在后面要手动加延迟
+		SysTick_DelayMs(nTime);
+		
+		// 停顿1s 
+		SysTick_DelayMs(1000);
+		
+		// 舵机轮式模式定速控制 逆时针旋转3s
+		is_cw = 0;
+		FSUS_WheelMoveTime(servoUsart, servoId, is_cw, speed, nTime);
+		SysTick_DelayMs(nTime);
+		
+		// 停顿1s 
+		SysTick_DelayMs(1000);
+	}
 }
-
 ```
 
 
 
-## 10.**舵机状态读取**
+### 8.6.例程-舵机定圈旋转
 
 
 
-### 10.1.读取参数
+**功能简介**
+
+测试舵机定圈旋转，顺时针旋转一圈，然后逆时针旋转一圈。
+
+
+
+**源代码**
+
+```c
+/***************************************************
+ * 轮式模式 定圈旋转
+ * <注意事项>
+ * 	  在测试本例程时, 请确保舵机没有机械结构/接线的约束, 
+ * 	  舵机可以360度旋转
+ ***************************************************/
+#include "stm32f10x.h"
+#include "usart.h"
+#include "sys_tick.h"
+#include "fashion_star_uart_servo.h"
+
+// 使用串口1作为舵机控制的端口
+// <接线说明>
+// STM32F103 PA9(Tx)  <----> 总线伺服舵机转接板 Rx
+// STM32F103 PA10(Rx) <----> 总线伺服舵机转接板 Tx
+// STM32F103 GND 	  <----> 总线伺服舵机转接板 GND
+// STM32F103 V5 	  <----> 总线伺服舵机转接板 5V
+// <注意事项>
+// 使用前确保已设置usart.h里面的USART1_ENABLE为1
+// 设置完成之后, 将下行取消注释
+Usart_DataTypeDef* servoUsart = &usart1; 
+
+FSUS_STATUS statusCode; // 请求包的状态码
+uint8_t servoId = 0; 	// 连接在转接板上的总线伺服舵机ID号
+uint16_t speed = 200; 	// 舵机的旋转速度 单位°/s
+uint8_t is_cw = 0; 		// 舵机的旋转方向
+uint16_t nCircle = 1; 	// 舵机旋转的圈数
+
+// 估计旋转圈数所需要花费的时间
+uint16_t estimateTimeMs(uint16_t nCircle, uint16_t speed){
+	return (uint16_t)((float)nCircle * 360.0 / (float)speed * 1000);
+}
+
+int main (void)
+{
+	// 嘀嗒定时器初始化
+	SysTick_Init();
+	// 串口初始化
+	Usart_Init();
+	
+	while (1){
+		// 舵机轮转模式定速控制 顺时针旋转1圈
+		is_cw = 1;
+		FSUS_WheelMoveNCircle(servoUsart, servoId, is_cw, speed, nCircle);
+		// FSUS_WheelMoveNCircle是非阻塞的,因为有时候需要控制多个舵机同时旋转
+		// 延时估算所需时间
+		SysTick_DelayMs(estimateTimeMs(nCircle, speed));
+		
+		// 停顿1s 
+		SysTick_DelayMs(1000);
+		
+		// 舵机轮转模式定速控制 逆时针旋转1圈
+		is_cw = 0;
+		FSUS_WheelMoveNCircle(servoUsart, servoId, is_cw, speed, nCircle);
+		// 注意: FSUS_WheelMoveNCircle是非阻塞的,因为有时候需要控制多个舵机同时旋转
+		// 延时估算所需时间
+		SysTick_DelayMs(estimateTimeMs(nCircle, speed));
+		
+		// 停顿1s 
+		SysTick_DelayMs(1000);
+	}
+}
+```
+
+
+
+## 9.**舵机状态读取**
+
+
+
+### 9.1.读取参数
 
 **函数原型**
 
@@ -1796,7 +1819,7 @@ if (statusCode == FSUS_STATUS_SUCCESS)
 
 
 
-### 10.2.写入自定义参数
+### 9.2.写入自定义参数
 
 </td></tr></table><table><tr><td bgcolor=#DDDDDD>
 
@@ -1826,7 +1849,7 @@ value = (int16_t)(angleLimitLow*10); // 舵机角度下限 转换单位为0.1度
 statusCode = FSUS_WriteData(servoUsart, servoId, FSUS_PARAM_ANGLE_LIMIT_LOW, (uint8_t *)&value, 2);
 ```
 
-### 10.3.重置舵机自定义参数
+### 9.3.重置舵机自定义参数
 
 **函数原型**
 
@@ -1848,7 +1871,7 @@ FSUS_ResetUserData(servoUsart, servoId);
 
 
 
-### 10.4.例程-读取舵机参数（温度、功率、工作状态）
+### 9.4.例程-读取舵机参数（温度、功率、工作状态）
 
 **功能简介**
 
@@ -2033,7 +2056,7 @@ read success, voltage too high                 //如果当前电压超过舵机�
 
 
 
-## 11.控制模式停止指令
+## 10.舵机失锁
 
 </td></tr></table><table><tr><td bgcolor=#DDDDDD>
 
@@ -2046,111 +2069,20 @@ read success, voltage too high                 //如果当前电压超过舵机�
 **函数原型**
 
 ```c
-FSUS_STATUS FSUS_StopOnControlMode(Usart_DataTypeDef *usart, uint8_t servo_id, uint8_t mode, uint16_t power)；
+FSUS_STATUS FSUS_WheelStop(Usart_DataTypeDef *usart, uint8_t servoId);
 ```
 
 * `usart` 舵机控制对应的串口数据对象`Usart_DataTypeDef`
-* `servo_id` 舵机的ID
-* `mode` 舵机停止指令编号
-* `power` 舵机的功率  单位mW
+* `servoId` 舵机的ID
 
 **使用示例**
 
 ```c
-/* 舵机控制模式停止指令*/
-//mode 指令停止形式
-//0-停止后卸力(失锁)
-//1-停止后保持锁力
-//2-停止后进入阻尼状态
-uint8_t stopcolmode=0;
-uint8_t servo_id = 0; 	// 连接在转接板上的总线伺服舵机ID号
-uint16_t power = 500;  //功率
-FSUS_StopOnControlMode(servoUsart, servo_id, stopcolmode, power);
+uint8_t servoId = 0; 	// 连接在转接板上的总线伺服舵机ID号
+FSUS_WheelStop(servoUsart, servoId); 
 ```
 
-### 11.1.例程-控制模式停止状态
-
-
-
-**功能简介**
-
-执行完控制指令进入阻尼状态
-
-
-
-**源代码**
-
-```c
-/********************************************************
-* 控制舵机执行完指令后进入阻尼状态
- ********************************************************/
-#include "stm32f10x.h"
-#include "usart.h"
-#include "sys_tick.h"
-#include "fashion_star_uart_servo.h"
-
-// 使用串口1作为舵机控制的端口
-// <接线说明>
-// STM32F103 PA9(Tx)    <----> 总线伺服舵机转接板 Rx
-// STM32F103 PA10(Rx)   <----> 总线伺服舵机转接板 Tx
-// STM32F103 GND        <----> 总线伺服舵机转接板 GND
-// STM32F103 V5         <----> 总线伺服舵机转接板 5V
-// <注意事项>
-// 使用前确保已设置usart.h里面的USART1_ENABLE为1
-Usart_DataTypeDef* servo_usart = &usart1; 
-
-// 使用串口2作为日志输出的端口
-// <接线说明>
-// STM32F103 PA2(Tx) <----> USB转TTL Rx
-// STM32F103 PA3(Rx) <----> USB转TTL Tx
-// STM32F103 GND     <----> USB转TTL GND
-// STM32F103 V5      <----> USB转TTL 5V (可选)
-Usart_DataTypeDef* logging_usart = &usart2;
-
-// 重定向c库函数printf到串口，重定向后可使用printf函数
-int fputc(int ch, FILE *f)
-{
-    while((logging_usart->pUSARTx->SR&0X40)==0){}
-    /* 发送一个字节数据到串口 */
-    USART_SendData(logging_usart->pUSARTx, (uint8_t) ch);
-    /* 等待发送完毕 */
-    // while (USART_GetFlagStatus(USART1, USART_FLAG_TC) != SET);       
-    return (ch);
-}
-
-
-//0-停止后卸力(失锁)
-//1-停止后保持锁力
-//2-停止后进入阻尼状态
-uint8_t stopcolmode=0;
-	
-float	angle = 135.0;// 舵机的目标角度
-uint16_t interval = 1000;// 时间间隔ms
-uint16_t	power = 500;// 舵机执行功率
-uint8_t servo_id=0;// 舵机的ID号
-
-int main (void)
-{
-    // 嘀嗒定时器初始化
-    SysTick_Init();
-    // 串口初始化
-    Usart_Init();
-
-  	FSUS_SetServoAngle(servo_usart, servo_id, angle, interval, power);
-	SysTick_DelayMs(2000);
-	
-	//停止后进入对应状态
-	FSUS_StopOnControlMode(servo_usart, servo_id, stopcolmode, power);
-	SysTick_DelayMs(1000);
-    while (1){
-			
-  }
-}
-```
-
-
-
-## 12.原点设置
+## 11.原点设置
 
 </td></tr></table><table><tr><td bgcolor=#DDDDDD>
 
@@ -2177,139 +2109,6 @@ FSUS_STATUS FSUS_SetOriginPoint(Usart_DataTypeDef *usart, uint8_t servo_id);
 uint8_t servoId = 0;    // 舵机的ID号
 FSUS_SetOriginPoint(servoUsart, servoId); // 设置当前舵机角度为原点
 ```
-
-
-
-## 13.开启停止异步模式
-
-### 13.1.开启异步
-
-**函数原型**
-
-```c
-FSUS_STATUS FSUS_BeginAsync(Usart_DataTypeDef *usart)；
-```
-
-* `usart` 舵机控制对应的串口数据对象`Usart_DataTypeDef`
-
-**使用示例**
-
-```c
-FSUS_BeginAsync(servo_usart);
-```
-
-### 13.2.停止异步
-
-**函数原型**
-
-```c
-FSUS_STATUS FSUS_EndAsync(Usart_DataTypeDef *usart,uint8_t mode)；
-```
-
-* `usart` 舵机控制对应的串口数据对象`Usart_DataTypeDef`
-* `mode` 舵机停止异步的模式
-
-**使用示例**
-
-```c
-uint8_t async_mode=0; //0:执行存储的命令  1:取消存储的命令
-FSUS_EndAsync(servo_usart,async_mode);
-```
-
-### 13.3.例程-开启停止异步命令
-
-
-
-**功能简介**
-
-存储一次命令
-
-
-
-**源代码**
-
-```c
-/********************************************************
- * 存储一次命令，在下次发送命令的时候才执行 
- ********************************************************/
-#include "stm32f10x.h"
-#include "usart.h"
-#include "sys_tick.h"
-#include "fashion_star_uart_servo.h"
-
-// 使用串口1作为舵机控制的端口
-// <接线说明>
-// STM32F103 PA9(Tx)    <----> 总线伺服舵机转接板 Rx
-// STM32F103 PA10(Rx)   <----> 总线伺服舵机转接板 Tx
-// STM32F103 GND        <----> 总线伺服舵机转接板 GND
-// STM32F103 V5         <----> 总线伺服舵机转接板 5V
-// <注意事项>
-// 使用前确保已设置usart.h里面的USART1_ENABLE为1
-Usart_DataTypeDef* servo_usart = &usart1; 
-
-// 使用串口2作为日志输出的端口
-// <接线说明>
-// STM32F103 PA2(Tx) <----> USB转TTL Rx
-// STM32F103 PA3(Rx) <----> USB转TTL Tx
-// STM32F103 GND     <----> USB转TTL GND
-// STM32F103 V5      <----> USB转TTL 5V (可选)
-Usart_DataTypeDef* logging_usart = &usart2;
-
-
-
-// 重定向c库函数printf到串口，重定向后可使用printf函数
-int fputc(int ch, FILE *f)
-{
-    while((logging_usart->pUSARTx->SR&0X40)==0){}
-    /* 发送一个字节数据到串口 */
-    USART_SendData(logging_usart->pUSARTx, (uint8_t) ch);
-    /* 等待发送完毕 */
-    // while (USART_GetFlagStatus(USART1, USART_FLAG_TC) != SET);       
-    return (ch);
-}
-
-
-#define ID 0 // 舵机的ID号
-float angle;           //舵机角度设置
-float angle_read;			 // 读取的角度
-uint16_t power = 1000; // 舵机执行功率 单位mV 默认为0
-uint16_t interval = 0; // 舵机旋转的周期
-
-uint8_t async_mode=0; //0:执行存储的命令  1:取消存储的命令
-
-int main (void)
-{
-    // 嘀嗒定时器初始化
-    SysTick_Init();
-    // 串口初始化
-    Usart_Init();
-
-    while (1){
-			
-    //开启异步命令
-		FSUS_BeginAsync(servo_usart);
-	
-		printf("GOTO: 135.0f\r\n");
-    // 简易角度控制 + 当前角度查询
-    angle = 135.0;
-    interval = 2000;
-    FSUS_SetServoAngle(servo_usart, ID, angle, interval, power);
-    FSUS_QueryServoAngle(servo_usart, ID, &angle_read);
-    printf("Cur Angle: %.1f\r\n", angle_read);
-		
-		printf("*******************\n");
-		
-	//第一次发送上面的命令是不会动的，只是存储了命令
-	//等待5秒
-		SysTick_DelayMs(5000);
-		
-		//停止异步命令
-		FSUS_EndAsync(servo_usart,async_mode);
-  }
-}
-```
-
-
 
 
 
