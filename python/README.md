@@ -10,7 +10,7 @@
 
 上位机软件可以调试总线伺服舵机，测试总线伺服舵机的功能。
 
-- 上位机软件：[FashionStar UART总线伺服舵机上位机软件](https://fashionrobo.com/wp-content/uploads/download/Develop-US_1.0.4.171.zip)
+- 上位机软件：[FashionStar UART总线伺服舵机上位机软件](https://fashionrobo.com/downloadcenter)
 
 - 使用说明：[总线伺服舵机上位机软件使用说明](https://wiki.fashionrobo.com/uartbasic/uart-servo-software/)
 
@@ -445,7 +445,7 @@ def reset_multi_turn_angle(self, servo_id:int):
 
 
 
-##  9.轮转模式
+##  9.轮转模式(316版本以及后续版本已弃用)
 
 
 
@@ -1145,6 +1145,508 @@ angle = uservo.query_servo_angle(SERVO_ID)
 print("设置新的原点后舵机角度: {:4.1f} °".format(angle), end='\n')
 
 
+```
+
+## 14.同步命令
+
+> 注：**仅适用于无刷磁编码舵机V316及之后的版本**
+
+**支持的命令编号**
+
+| 数据包编号 | 数据包命名                           | 功能                         |
+| :--------- | :----------------------------------- | :--------------------------- |
+| 8          | MoveOnAngleMode(Rotate)              | 角度模式                     |
+| 11         | MoveOnAngleModeExByInterval          | 角度模式(基于加减速时间)     |
+| 12         | MoveOnAngleModeExByVelocity          | 角度模式(基于目标速度)       |
+| 13         | MoveOnMultiTurnAngleMode(Rotate)     | 多圈角度控制                 |
+| 14         | MoveOnMultiTurnAngleModeExByInterval | 多圈角度控制(基于加减速时间) |
+| 15         | MoveOnMultiTurnAngleModeExByVelocity | 多圈角度控制(基于目标速度)   |
+| 22         | ServoMonitor                         | 舵机数据监控                 |
+
+### 14.1.API-`send_sync_angle`
+
+**函数原型**
+
+```python
+def send_sync_angle(self, command_id, servo_num, command_data_list):
+```
+
+**输入参数**
+
+- `command_id`: 命令编号
+- `servo_num`: 舵机个数
+- `command_data_list`: 命令数据列表
+
+**输出参数**
+
+- 无
+
+### 14.2.API-`send_sync_anglebyinterval`
+
+**函数原型**
+
+```python
+def send_sync_anglebyinterval(self, command_id, servo_num, command_data_list):
+```
+
+**输入参数**
+
+- `command_id`: 命令编号
+- `servo_num`: 舵机个数
+- `command_data_list`: 命令数据列表
+
+**输出参数**
+
+- 无
+
+### 14.3.API-`send_sync_anglebyvelocity`
+
+**函数原型**
+
+```python
+def send_sync_anglebyvelocity(self, command_id, servo_num, command_data_list):
+```
+
+**输入参数**
+
+- `command_id`: 命令编号
+- `servo_num`: 舵机个数
+- `command_data_list`: 命令数据列表
+
+**输出参数**
+
+- 无
+
+### 14.4.API-`send_sync_multiturnangle`
+
+**函数原型**
+
+```python
+def send_sync_multiturnangle(self, command_id, servo_num, command_data_list):
+```
+
+**输入参数**
+
+- `command_id`: 命令编号
+- `servo_num`: 舵机个数
+- `command_data_list`: 命令数据列表
+
+**输出参数**
+
+- 无
+
+### 14.5.API-`send_sync_multiturnanglebyinterval`
+
+**函数原型**
+
+```python
+def send_sync_multiturnanglebyinterval(self, command_id, servo_num, command_data_list):
+```
+
+**输入参数**
+
+- `command_id`: 命令编号
+- `servo_num`: 舵机个数
+- `command_data_list`: 命令数据列表
+
+**输出参数**
+
+- 无
+
+- 
+
+### 14.6.API-`send_sync_multiturnanglebyvelocity`
+
+**函数原型**
+
+```c
+uservo.set_origin_point(self, servo_id:int):
+```
+
+**输入参数**
+
+- `command_id`: 命令编号
+- `servo_num`: 舵机个数
+- `command_data_list`: 命令数据列表
+
+**输出参数**
+
+- 无
+
+### 14.7.API-`send_sync_servo_monitor`
+
+**函数原型**
+
+```python
+def send_sync_servo_monitor(self, servo_ids):
+```
+
+**输入参数**
+
+- `command_id`: 命令编号
+- `servo_num`: 舵机个数
+- `command_data_list`: 命令数据列表
+
+**输出参数**
+
+- ID
+- 电压
+- 电流
+- 功率
+- 温度
+- 状态
+- 角度
+- 圈数
+
+### 14.8.例程源码
+
+`example/sync_mode`
+
+```python
+'''
+总线伺服舵机
+> Python SDK同步指令 Example <
+--------------------------------------------------
+ * 作者: 深圳市华馨京科技有限公司
+ * 网站：https://fashionrobo.com/
+ * 更新时间: 2024/12/23
+--------------------------------------------------
+'''
+# 添加uservo.py的系统路径
+import sys
+sys.path.append("../../src")
+
+
+import time
+import serial
+import struct
+# 导入串口舵机管理器
+from uservo import UartServoManager
+# 设置日志输出模式为INFO
+USERVO_PORT_NAME = 'COM3'
+uart = serial.Serial(port=USERVO_PORT_NAME, baudrate=115200,\
+                     parity=serial.PARITY_NONE, stopbits=1,\
+                     bytesize=8,timeout=0)
+srv_num = 6# 舵机个数
+uservo = UartServoManager(uart, is_debug=True)
+
+
+command_data_list1 = [
+    struct.pack('<BhHH', 1, -400, 500, 10000),  # 同步命令角度模式控制
+    struct.pack('<BhHH', 2, -400 ,500, 10000),  #id2+度数-40 +时间 +功率
+]
+uservo.send_sync_angle(8, 2, command_data_list1)
+time.sleep(2.02)
+
+command_data_list2 = [
+    struct.pack('<BhHHHH', 1, 400, 500, 100, 100, 10000) , # 同步命令角度模式控制(基於加减速時間)
+    struct.pack('<BhHHHH', 2, 400, 500, 100, 100, 10000) , #id2+度数40+总时间+启动加速时间+运动减速时间+功率
+]
+uservo.send_sync_anglebyinterval(11, 2, command_data_list2)
+time.sleep(2.02)
+
+
+command_data_list4 = [
+    struct.pack('<BhHHHH', 1, 600, 500, 100, 100, 10000), # 同步命令角度模式控制 (基於速率的運動控制 )
+    struct.pack('<BhHHHH', 2, 600, 500, 100, 100, 10000), # id2+度数60+时间+功率
+]
+uservo.send_sync_anglebyvelocity(12, 2, command_data_list4)
+time.sleep(2.02)
+
+
+command_data_list3 = [
+    struct.pack('<BlLH', 1, 800, 1500, 10000)  ,# 同步命令多圈角度模式控制
+    struct.pack('<BlLH', 2, 800 ,1500, 10000)  ,# id2+度数80 +时间 +功率
+]
+uservo.send_sync_multiturnangle(13, 2, command_data_list3)
+time.sleep(2.02)
+
+
+
+command_data_list5 = [
+    struct.pack('<BlLHHH', 1, 10010, 1000, 100,100,10000)  ,# 多圈角度模式控制 (基於加減速時段的運動控制 )
+    struct.pack('<BlLHHH', 2, 10010 ,1000,100,100, 10000)  ,# id2+度数1001+总时间+启动加速时间+运动减速时间+功率
+]
+uservo.send_sync_multiturnanglebyinterval(14, 2, command_data_list5)
+time.sleep(2.02)
+
+
+
+command_data_list6 = [
+    struct.pack('<BlHHHH', 1, 12010, 3000,100 ,100,10000)  ,# 多圈角度模式控制(基於速率的運動控制)
+    struct.pack('<BlHHHH', 2, 12010 ,3000, 100, 100, 10000)  ,# id2+度数1201+目标速度300dps+启动加速时间+运动减速时间+功率
+]
+uservo.send_sync_multiturnanglebyvelocity(15, 2, command_data_list6)
+```
+
+`example/sync_monitor`
+
+```python
+'''
+总线伺服舵机
+> Python SDK同步命令-同步监控 Example <
+--------------------------------------------------
+ * 作者: 深圳市华馨京科技有限公司
+ * 网站：https://fashionrobo.com/
+ * 更新时间: 2024/12/23
+--------------------------------------------------
+'''
+# 添加uservo.py的系统路径
+import sys
+sys.path.append("../../src")
+# 导入依赖
+import time
+import serial
+from uservo import UartServoManager
+
+# 参数配置
+# 角度定义
+SERVO_PORT_NAME =  'COM4' # 舵机串口号
+SERVO_BAUDRATE = 115200 # 舵机的波特率
+SERVO_ID = 0  # 舵机的ID号
+
+# 初始化串口
+uart = serial.Serial(port=SERVO_PORT_NAME, baudrate=SERVO_BAUDRATE,\
+					 parity=serial.PARITY_NONE, stopbits=1,\
+					 bytesize=8,timeout=0)
+# 初始化舵机管理器
+uservo = UartServoManager(uart)
+
+power = 500 # 阻尼模式下的功率, 单位mW
+uservo.set_damping(SERVO_ID, power)
+
+
+
+servo_ids = [5,6,2,76,17]  # 想要同步读取的舵机ID列表
+servo_monitor_data = uservo.send_sync_servo_monitor(servo_ids)
+for servo_id, info in servo_monitor_data.items():
+    if info:
+        print("舵机ID: {}, 电压: {:.2f} V, 电流: {:.2f} A, 功率: {:.2f} W, 温度: {:.2f} °C, 状态: {}, 角度: {:.2f} °, 圈数: {:.0f}"
+              .format(servo_id, info.voltage / 1000, info.current / 1000, info.power / 1000, info.temp, info.status, info.angle, info.turn))
+```
+
+
+
+## 15.异步命令
+
+> 注：**仅适用于无刷磁编码舵机V316及之后的版本**
+
+### API-`begin_async`
+
+开始异步指令，对下一个接收到的指令进行缓存，仅支持角度指令。
+
+**函数原型**
+
+```python
+def begin_async(self):
+```
+
+**输入参数**
+
+- 无
+
+**输出参数**
+
+- 无
+
+
+
+### API-`end_async`
+
+结束异步指令，立即执行缓存指令。若参数 cancel 不为0，則清除缓存缓存。
+
+**函数原型**
+
+```python
+def end_async(self,cancel=0):
+```
+
+**输入参数**
+
+- `cancel`：是否取消
+
+**输出参数**
+
+- 无
+
+### 例程源码
+
+`example/async_mode`
+
+```python
+'''
+总线伺服舵机
+> Python SDK异步指令 Example <
+--------------------------------------------------
+ * 作者: 深圳市华馨京科技有限公司
+ * 网站：https://fashionrobo.com/
+ * 更新时间: 2024/12/23
+--------------------------------------------------
+'''
+# 添加uservo.py的系统路径
+import sys
+sys.path.append("../../src")
+# 导入依赖
+import time
+import struct
+import serial
+from uservo import UartServoManager
+
+# 参数配置
+# 角度定义
+SERVO_PORT_NAME =  'COM6'		# 舵机串口号 请根据实际串口进行修改
+SERVO_BAUDRATE = 115200			# 舵机的波特率 请根据实际波特率进行修改
+
+SERVO_ID = 0       #舵机ID
+# 初始化串口
+uart = serial.Serial(port=SERVO_PORT_NAME, baudrate=SERVO_BAUDRATE,\
+					 parity=serial.PARITY_NONE, stopbits=1,\
+					 bytesize=8,timeout=0)
+# 初始化舵机管理器
+uservo = UartServoManager(uart, is_debug=True)
+uservo.begin_async()   #  开始异步命令
+time.sleep(0.02)
+SERVO_ID  = 0
+uservo.set_servo_angle( 0, angle = 20.0, interval=0, power=10000) 
+time.sleep(2.02)
+uservo.end_async(0)    #  结束异步命令    0:執行； 1:取消
+```
+
+
+
+## 16.数据监控
+
+> 注：**仅适用于无刷磁编码舵机V316及之后的版本**
+
+### API-`query_servo_monitor`
+
+获取舵机数据。
+
+**函数原型**
+
+```python
+def query_servo_monitor(self,servo_id=0):
+```
+
+**输入参数**
+
+- `servo_id`：舵机ID
+
+**输出参数**
+
+- `voltage`：舵机电压
+- `current`：舵机电流
+- `voltage`：舵机功率
+- `temp`：舵机温度
+- `status`：舵机状态
+- `angle`：舵机角度(单圈/多圈）
+- `turn`：圈数
+
+### 例程源码
+
+`example/servo_monitor`
+
+```python
+'''
+总线伺服舵机
+> Python SDK监控指令 Example <
+--------------------------------------------------
+ * 作者: 深圳市华馨京科技有限公司
+ * 网站：https://fashionrobo.com/
+ * 更新时间: 2024/12/23
+--------------------------------------------------
+'''
+# 添加uservo.py的系统路径
+import sys
+sys.path.append("../../src")
+# 导入依赖
+import time
+import struct
+import serial
+from uservo import UartServoManager
+
+# 参数配置
+SERVO_PORT_NAME =  'COM5'		# 舵机串口号 请根据实际串口进行修改
+SERVO_BAUDRATE = 115200			# 舵机的波特率 请根据实际波特率进行修改
+servo_id = 0                    # 监控的舵机id号
+
+# 初始化串口
+uart = serial.Serial(port=SERVO_PORT_NAME, baudrate=SERVO_BAUDRATE,\
+					 parity=serial.PARITY_NONE, stopbits=1,\
+					 bytesize=8,timeout=0)
+# 初始化舵机管理器
+uservo = UartServoManager(uart, is_debug=True)
+servo_info = uservo.query_servo_monitor(servo_id=0)
+print("舵机 电压: {:.2f} V".format( servo_info["voltage"]/1000))         #单个参数
+
+print("舵机 角度: {:.2f} °".format( servo_info["angle"] )) 
+print("舵机电压: {:.2f}V, 电流: {:.2f}A, 功率: {:.2f}W, 温度: {:.2f}°C, 状态: {}, 角度: {:.2f}°, 圈数: {:.0f}"
+          .format( servo_info["voltage"] / 1000, servo_info["current"] / 1000, servo_info["power"] / 1000, servo_info["temp"], servo_info["status"], servo_info["angle"], servo_info["turn"])) #多个参数
+```
+
+
+
+## 17.控制模式停止指令
+
+> 注：**仅适用于无刷磁编码舵机V316及之后的版本**
+
+### API-`stop_on_control_mode`
+
+使舵机停止后保持不同状态模式。
+
+**函数原型**
+
+```python
+def stop_on_control_mode(self,servo_id, method, power):
+```
+
+**输入参数**
+
+- `servo_id`：舵机ID
+- `method`：停止后的模式：0x10 卸力  ；0x11保持锁力；0x12进入阻尼状态
+- `power`：保持的功率
+
+**输出参数**
+
+- 无
+
+### 例程源码
+
+`example/stop_on_control_mode`
+
+```python
+'''
+总线伺服舵机
+> MicroPython SDK停止指令 Example <
+--------------------------------------------------
+ * 作者: 深圳市华馨京科技有限公司
+ * 网站：https://fashionrobo.com/
+ * 更新时间: 2024/12/23
+--------------------------------------------------
+'''
+import ustruct
+from machine import UART
+from uservo import UartServoManager
+import time
+
+
+# 舵机ID编号: [0, 1, 2, ..., srv_num-1]
+# 扫描舵机个数
+servo_num = 4
+# 舵机ID
+servo_id = 0
+# 舵机是否有多圈模式的功能
+#servo_has_mturn_func = False
+# 创建串口对象 使用串口2作为控制对象
+# 波特率: 115200
+# RX: gpio 16
+# TX: gpio 17
+uart = UART(2, baudrate=115200)
+# 创建舵机管理器
+uservo = UartServoManager(uart, srv_num=servo_num)
+uservo.stop_on_control_mode(servo_id, method=0x10, power=500)
+uservo.stop_on_control_mode(servo_id, method=0x11, power=500)
+uservo.stop_on_control_mode(servo_id, method=0x12, power=500)
 ```
 
 
