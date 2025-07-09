@@ -14,9 +14,6 @@
 // Variable definition
 extern Usart_DataTypeDef *servo_usart;
 
-// Run test example according to example ID
-void FSUSExample_Run(uint8_t example_id);
-
 /* Servo communication test */
 void FSUSExample_PingServo(void);
 

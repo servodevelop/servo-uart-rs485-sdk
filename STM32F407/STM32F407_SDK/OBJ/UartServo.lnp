@@ -1,0 +1,19 @@
+--cpu=Cortex-M4.fp.sp
+"..\obj\main.o"
+"..\obj\stm32f4xx_it.o"
+"..\obj\system_stm32f4xx.o"
+"..\obj\fashion_star_uart_servo_examples.o"
+"..\obj\ring_buffer.o"
+"..\obj\usart.o"
+"..\obj\fashion_star_uart_servo.o"
+"..\obj\sys_tick.o"
+"..\obj\startup_stm32f40_41xxx.o"
+"..\obj\misc.o"
+"..\obj\stm32f4xx_gpio.o"
+"..\obj\stm32f4xx_rcc.o"
+"..\obj\stm32f4xx_syscfg.o"
+"..\obj\stm32f4xx_usart.o"
+--library_type=microlib --strict --scatter "..\OBJ\UartServo.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "..\OBJ\UartServo.map" -o ..\OBJ\UartServo.axf

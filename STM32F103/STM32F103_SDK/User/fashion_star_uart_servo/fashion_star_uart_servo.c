@@ -691,7 +691,7 @@ FSUS_STATUS FSUS_ServoMonitor(Usart_DataTypeDef *usart, uint8_t servo_id, ServoD
     servodata[0].temperature = 1 / (log(temp / (4096.0f - temp)) / 3435.0f + 1 / (273.15 + 25)) - 273.15;
     servodata[0].status = pkg.content[9];
     servodata[0].angle = (int32_t)((pkg.content[13] << 24) | (pkg.content[12] << 16) | (pkg.content[11] << 8) | pkg.content[10]);
-    servodata[0].angle = (float)(servodata[0].angle/10.0);
+    servodata[0].angle = servodata[0].angle/10.0f;
     servodata[0].circle_count = (int16_t)((pkg.content[15] << 8) | pkg.content[14]);
 
     // Reset pkg status to receive next set of data
@@ -911,7 +911,7 @@ FSUS_STATUS FSUS_SyncServoMonitor(Usart_DataTypeDef *usart, uint8_t servo_count,
 				servodata[packet_count].temperature = 1 / (log(temp / (4096.0f - temp)) / 3435.0f + 1 / (273.15 + 25)) - 273.15;
         servodata[packet_count].status = pkg.content[9];
         servodata[packet_count].angle = (int32_t)((pkg.content[13] << 24) | (pkg.content[12] << 16) | (pkg.content[11] << 8) | pkg.content[10]);
-				servodata[packet_count].angle = (float)(servodata[packet_count].angle/10.0);
+				servodata[packet_count].angle = servodata[packet_count].angle/10.0f;
         servodata[packet_count].circle_count = (int16_t)((pkg.content[15] << 8) | pkg.content[14]);
 
 				// Complete parsing a set of packets, plus one.

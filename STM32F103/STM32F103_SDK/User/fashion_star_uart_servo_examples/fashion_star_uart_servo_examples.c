@@ -140,7 +140,7 @@ void FSUSExample_SetNServoAngle(void)
 	while (1)
 	{
 		// Simple angle control command, control servos 0 and 1
-        FSUS_SetServoAngle(servo_usart, 0, 135.0, interval, power);
+        FSUS_SetServoAngle(servo_usart, 0, 90.0, interval, power);
         FSUS_SetServoAngle(servo_usart, 1, 45.0, interval, power);
 				
         // Wait for action to complete
@@ -150,7 +150,7 @@ void FSUSExample_SetNServoAngle(void)
         SysTick_DelayMs(1000);
 
         // Simple angle control command, control servos 0 and 1
-        FSUS_SetServoAngle(servo_usart, 0, -135.0, interval, power);
+        FSUS_SetServoAngle(servo_usart, 0, -90.0, interval, power);
         FSUS_SetServoAngle(servo_usart, 1, -45.0, interval, power);
         // Wait for action to complete
         SysTick_DelayMs(interval);
