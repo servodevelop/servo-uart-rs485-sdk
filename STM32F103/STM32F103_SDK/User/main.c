@@ -7,8 +7,8 @@
 
 int main(void)
 { 
-  SysTick_Init();           // 系统时钟初始化
-  Usart_Init();              // 串口初始化
+  SysTick_Init();           // System Clock Initialization
+  Usart_Init();              // Serial port initialization
 	
  	FSUSExample_PingServo();		// <---   update here
 //	FSUSExample_SetServoAngle();

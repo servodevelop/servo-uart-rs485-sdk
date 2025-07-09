@@ -1,5 +1,5 @@
 /*
- * 串口总线舵机示例代码
+ * UART Servo Example Code
  * ---------------------------------------------------
  * ---------------------------------------------------
  */
@@ -7,48 +7,48 @@
 #include "fashion_star_uart_servo_examples.h"
 #include "math.h"
 
-// 使用串口1作为舵机控制的端口
-// <接线说明>
-// STM32F103 PA9(Tx)    <----> 总线伺服舵机转接板 Rx
-// STM32F103 PA10(Rx)   <----> 总线伺服舵机转接板 Tx
-// STM32F103 GND        <----> 总线伺服舵机转接板 GND
-// STM32F103 V5         <----> 总线伺服舵机转接板 5V
-// <注意事项>
-// 使用前确保已设置usart.h里面的USART1_ENABLE为1
+// Use UART1 as the servo control port
+// <Wiring Instructions>
+// STM32F103 PA9(Tx)    <----> Servo Transceiver Board Rx
+// STM32F103 PA10(Rx)   <----> Servo Transceiver Board Tx
+// STM32F103 GND        <----> Servo Transceiver Board GND
+// STM32F103 V5         <----> Servo Transceiver Board 5V
+// <Notes>
+// Make sure USART1_ENABLE is set to 1 in usart.h before use
 Usart_DataTypeDef* servo_usart = &usart1; 
 
-// 使用串口2作为日志输出的端口
-// <接线说明>
-// STM32F103 PA2(Tx) <----> USB转TTL Rx
-// STM32F103 PA3(Rx) <----> USB转TTL Tx
-// STM32F103 GND     <----> USB转TTL GND
-// STM32F103 V5      <----> USB转TTL 5V (可选)
+// Use UART2 as the logging output port
+// <Wiring Instructions>
+// STM32F103 PA2(Tx) <----> USB-TTL Rx
+// STM32F103 PA3(Rx) <----> USB-TTL Tx
+// STM32F103 GND     <----> USB-TTL GND
+// STM32F103 V5      <----> USB-TTL 5V (optional)
 Usart_DataTypeDef* logging_usart = &usart2;
 
 
-// 重定向c库函数printf到串口，重定向后可使用printf函数
+// Redirect C library function printf to UART, after redirection you can use printf function
 int fputc(int ch, FILE *f)
 {
     while((logging_usart->pUSARTx->SR&0X40)==0){}
-    /* 发送一个字节数据到串口 */
+    /* Send one byte of data to UART */
     USART_SendData(logging_usart->pUSARTx, (uint8_t) ch);
-    /* 等待发送完毕 */
+    /* Wait for transmission to complete */
     // while (USART_GetFlagStatus(USART1, USART_FLAG_TC) != SET);       
     return (ch);
 }
 
 
-/* 舵机通讯检测 */
+/* Servo Communication Test */
 void FSUSExample_PingServo(void)
 {
 
-	FSUS_STATUS status_code; // 状态码
-	uint8_t servo_id = 0;	 // 舵机ID = 0
+	FSUS_STATUS status_code; // Status code
+	uint8_t servo_id = 0;	 // Servo ID = 0
 
 	printf("===Test Uart Servo Ping===r\n");
 	while (1)
 	{
-		// 舵机通信检测
+		// Servo communication test
 		status_code = FSUS_Ping(servo_usart, servo_id);
 		if (status_code == FSUS_STATUS_SUCCESS)
 		{
@@ -58,48 +58,48 @@ void FSUSExample_PingServo(void)
 		{
 			printf("Servo Offline,Error Code=%d \r\n", status_code);
 		}
-		// 延时等待1s
+		// Delay for 1s
 		SysTick_DelayMs(1000);
 	}
 }
 
-/* 控制单个舵机的角度 */
+/* Control Single Servo Angle */
 void FSUSExample_SetServoAngle(void)
 {
-	// 舵机控制相关的参数
-	// 舵机的ID号
+	// Servo control related parameters
+	// Servo ID number
 	uint8_t servo_id = 0;
-	// 舵机的目标角度
-	// 舵机角度在-180度到180度之间, 最小单位0.1
+	// Target angle for the servo
+	// Servo angle range is -180 to 180 degrees, minimum unit 0.1
 	float angle = 0;
-	// 时间间隔ms
-	// 可以尝试修改设置更小的时间间隔，例如500ms
+	// Time interval in ms
+	// You can try setting a smaller time interval, e.g. 500ms
 	uint16_t interval;
-	// 目标转速
+	// Target speed
 	float velocity;
-	// 加速时间
+	// Acceleration time
 	uint16_t t_acc;
-	// 减速时间
+	// Deceleration time
 	uint16_t t_dec;
-	// 舵机执行功率 mV 默认为0
+	// Servo operating power in mV, default is 0
 	uint16_t power = 0;
-	// 读取的角度
+	// Read angle
 	float angle_read;
 
 	while (1)
 	{
 		printf("GOTO: 135.0f\r\n");
-        // 简易角度控制 + 当前角度查询
+        // Simple angle control + current angle query
         angle = 135.0;
         interval = 2000;
         FSUS_SetServoAngle(servo_usart, servo_id, angle, interval, power);
         FSUS_QueryServoAngle(servo_usart, servo_id, &angle_read);
         printf("Cur Angle: %.1f\r\n", angle_read);
 
-        // 等待2.5s
+        // Wait for 2.5s
         SysTick_DelayMs(2500);
 
-        // 带加减速的角度控制(指定周期) + 当前角度查询
+        // Angle control with acceleration/deceleration (specified period) + current angle query
         printf("GOTO+Interval: 0.0f\r\n");
         angle = 0.0f;
         interval = 1000;
@@ -109,10 +109,10 @@ void FSUSExample_SetServoAngle(void)
         FSUS_QueryServoAngle(servo_usart, servo_id, &angle_read);
         printf("Cur Angle: %.1f\r\n", angle_read);
 
-        // 等待2s
+        // Wait for 2s
         SysTick_DelayMs(2000);
 
-        // 带加减速的角度控制(指定转速) + 当前角度查询
+        // Angle control with acceleration/deceleration (specified speed) + current angle query
         printf("GOTO+Velocity: -135.0f\r\n");
         angle = -135.0f;
         velocity = 200.0f;
@@ -122,75 +122,75 @@ void FSUSExample_SetServoAngle(void)
         FSUS_QueryServoAngle(servo_usart, servo_id, &angle_read);
         printf("Cur Angle: %.1f\r\n", angle_read);
 				
-				// 等待3s
+				// Wait for 3s
         SysTick_DelayMs(3000);
 	}
 }
 
-/* 控制多个舵机的角度 */
+/* Control Multiple Servo Angles */
 void FSUSExample_SetNServoAngle(void)
 {
-	//// 舵机控制相关的参数
-	// 时间间隔ms
-	// 可以尝试修改设置更小的时间间隔，例如500ms
+	//// Servo control related parameters
+	// Time interval in ms
+	// You can try setting a smaller time interval, e.g. 500ms
 	uint16_t interval = 2000;
-	// 舵机执行功率 mV 默认为0
+	// Servo operating power in mV, default is 0
 	uint16_t power = 0;
 
 	while (1)
 	{
-		// 简易角度控制指令，控制0和1号舵机
+		// Simple angle control command, control servos 0 and 1
         FSUS_SetServoAngle(servo_usart, 0, 135.0, interval, power);
         FSUS_SetServoAngle(servo_usart, 1, 45.0, interval, power);
 				
-        // 等待动作完成
+        // Wait for action to complete
         SysTick_DelayMs(interval);
 
-        // 等待1s
+        // Wait for 1s
         SysTick_DelayMs(1000);
 
-        // 简易角度控制指令，控制0和1号舵机
+        // Simple angle control command, control servos 0 and 1
         FSUS_SetServoAngle(servo_usart, 0, -135.0, interval, power);
         FSUS_SetServoAngle(servo_usart, 1, -45.0, interval, power);
-        // 等待动作完成
+        // Wait for action to complete
         SysTick_DelayMs(interval);
 
-        // 等待1s
+        // Wait for 1s
         SysTick_DelayMs(1000);
 	}
 }
 
-/* 设置舵机角度(多圈模式) */
+/* Set Servo Angle (Multi-turn Mode) */
 void FSUSExample_SetServoAngleMTurn(void)
 {
-	//// 舵机控制相关的参数
-	// 舵机的ID号
+	//// Servo control related parameters
+	// Servo ID number
 	uint8_t servo_id = 0;
-	// 舵机的目标角度
-	// 舵机角度在-180度到180度之间, 最小单位0.1
+	// Target angle for the servo
+	// Servo angle range is -180 to 180 degrees, minimum unit 0.1
 	float angle;
-	uint32_t interval; // 时间间隔ms
-	float velocity;	   // 电机转速, 单位dps,°/s
-	// 舵机执行功率 mV 默认为0
+	uint32_t interval; // Time interval in ms
+	float velocity;	   // Motor speed, in dps (degrees per second)
+	// Servo operating power in mV, default is 0
 	uint16_t power = 0;
-	// 加速时间(单位ms)
+	// Acceleration time (in ms)
 	uint16_t t_acc;
-	// 减速时间
+	// Deceleration time
 	uint16_t t_dec;
-	// 读取的角度
+	// Read angle
 	float angle_read;
 
 	while (1)
 	{
 		printf("MTurn GOTO: 720.0f\r\n");
-        //简易多圈角度控制 + 当前多圈角度查询
+        // Simple multi-turn angle control + current multi-turn angle query
         angle = 720.0f;
         interval = 2000;
         FSUS_SetServoAngleMTurn(servo_usart, servo_id, angle, interval, power);
         FSUS_QueryServoAngleMTurn(servo_usart, servo_id, &angle_read);
         printf("Cur Angle: %.1f\r\n", angle_read);
 
-        // 等待4s
+        // Wait for 4s
         SysTick_DelayMs(4000);
 
 			
@@ -200,11 +200,11 @@ void FSUSExample_SetServoAngleMTurn(void)
         FSUS_QueryServoAngleMTurn(servo_usart, servo_id, &angle_read);
         printf("Cur Angle: %.1f\r\n", angle_read);
 
-        // 等待3s
+        // Wait for 3s
         SysTick_DelayMs(3000);
 
 
-        //带加减速的多圈角度控制(指定周期) + 当前多圈角度查询
+        // Multi-turn angle control with acceleration/deceleration (specified period) + current multi-turn angle query
         printf("MTurn+Interval GOTO: -180.0f\r\n");
         angle = 180.0f; 
         interval = 1000;
@@ -214,10 +214,10 @@ void FSUSExample_SetServoAngleMTurn(void)
         FSUS_QueryServoAngleMTurn(servo_usart, servo_id, &angle_read);
         printf("Cur Angle: %.1f\r\n", angle_read);
 
-        // 等待2s
+        // Wait for 2s
         SysTick_DelayMs(2000);
 
-        //带加减速的多圈角度控制(指定转速) + 当前多圈角度查询
+        // Multi-turn angle control with acceleration/deceleration (specified speed) + current multi-turn angle query
         printf("MTurn+Velocity GOTO: -180.0f\r\n");
         angle = -180.0f;
         velocity = 100.0f;
@@ -227,53 +227,53 @@ void FSUSExample_SetServoAngleMTurn(void)
         FSUS_QueryServoAngleMTurn(servo_usart, servo_id, &angle_read);
         printf("Cur Angle: %.1f\r\n", angle_read);
 
-        // 等待4s
+        // Wait for 4s
         SysTick_DelayMs(4000);
 	}
 }
 
-/* 舵机阻尼模式与角度回传 */
+/* Servo Damping Mode and Angle Feedback */
 void FSUSExample_SetServoDamping(void)
 {
-	FSUS_STATUS status_code; // 请求包的状态码
-	uint8_t servo_id = 0;	 // 连接在转接板上的总线伺服舵机ID号
-	uint16_t power = 500;	 // 阻尼模式下的功率，功率越大阻力越大
-	float angle = 0;		 // 舵机的角度
+	FSUS_STATUS status_code; // Status code for request packet
+	uint8_t servo_id = 0;	 // Servo ID number connected to the transceiver board
+	uint16_t power = 500;	 // Power in damping mode, higher power means more resistance
+	float angle = 0;		 // Servo angle
 
-	// 设置舵机为阻尼模式
+	// Set servo to damping mode
 	FSUS_DampingMode(servo_usart, servo_id, power);
 	while (1)
 	{
-		// 读取一下舵机的角度
+		// Read the servo angle
 		status_code = FSUS_QueryServoAngle(servo_usart, servo_id, &angle);
 
 		if (status_code == FSUS_STATUS_SUCCESS)
 		{
-			// 成功的读取到了舵机的角度
+			// Successfully read the servo angle
 			printf("[INFO] servo id= %d ; angle = %f\r\n", servo_id, angle);
 		}
 		else
 		{
-			// 没有正确的读取到舵机的角度
+			// Failed to read the servo angle
 			printf("\r\n[INFO] read servo %d angle, status code: %d \r\n", servo_id, status_code);
 			printf("[ERROR]failed to read servo angle\r\n");
 		}
-		// 等待1000ms
+		// Wait for 1000ms
 		SysTick_DelayMs(500);
 	}
 }
 
 
-/* 用户自定义数据-重置 */
+/* User-defined Data - Reset */
 void FSUSExample_ResetData(void)
 {
 
-	// 连接在转接板上的总线伺服舵机ID号
+	// Servo ID number connected to the transceiver board
 	uint8_t servo_id = 0;
-	// 状态码
+	// Status code
 	FSUS_STATUS status_code;
 
-	// 发送重置用户数据指令
+	// Send reset user data command
 	status_code = FSUS_ResetUserData(servo_usart, servo_id);
 	printf("=====reset user data======\r\n status code: %d\r\n", status_code);
 	if (status_code == FSUS_STATUS_SUCCESS)
@@ -285,26 +285,26 @@ void FSUSExample_ResetData(void)
 		printf("fail\r\n");
 	}
 
-	// 死循环
+	// Infinite loop
 	while (1)
 	{
 	}
 }
 
-/*读取舵机状态*/
+/* Read Servo Status */
 void FSUSExample_ReadData(void)
 {
-	uint8_t servo_id = 0;	// 连接在转接板上的总线伺服舵机ID号
-	FSUS_STATUS statusCode; // 状态码
+	uint8_t servo_id = 0;	// Servo ID number connected to the transceiver board
+	FSUS_STATUS statusCode; // Status code
 
-	// 数据表里面的数据字节长度一般为1个字节/2个字节/4个字节
-	// 查阅通信协议可知,舵机角度上限的数据类型是有符号短整型(UShort, 对应STM32里面的int16_t),长度为2个字节
-	// 所以这里设置value的数据类型为int16_t
+	// Data bytes length in the data table is generally 1 byte/2 bytes/4 bytes
+	// According to the communication protocol, the servo angle upper limit data type is signed short integer (UShort, corresponding to int16_t in STM32), length is 2 bytes
+	// So set the value data type to int16_t here
 	int16_t value;
 	uint8_t dataSize;
-	// 传参数的时候, 要将value的指针强行转换为uint8_t
+	// When passing parameters, cast the pointer of value to uint8_t
 
-	// 读取电压
+	// Read voltage
 	statusCode = FSUS_ReadData(servo_usart, servo_id, FSUS_PARAM_VOLTAGE, (uint8_t *)&value, &dataSize);
 
 	printf("read ID: %d\r\n", servo_id);
@@ -318,7 +318,7 @@ void FSUSExample_ReadData(void)
 		printf("fail\r\n");
 	}
 
-	// 读取电流
+	// Read current
 	statusCode = FSUS_ReadData(servo_usart, servo_id, FSUS_PARAM_CURRENT, (uint8_t *)&value, &dataSize);
 	if (statusCode == FSUS_STATUS_SUCCESS)
 	{
@@ -329,7 +329,7 @@ void FSUSExample_ReadData(void)
 		printf("fail\r\n");
 	}
 
-	// 读取功率
+	// Read power
 	statusCode = FSUS_ReadData(servo_usart, servo_id, FSUS_PARAM_POWER, (uint8_t *)&value, &dataSize);
 	if (statusCode == FSUS_STATUS_SUCCESS)
 	{
@@ -339,7 +339,7 @@ void FSUSExample_ReadData(void)
 	{
 		printf("fail\r\n");
 	}
-	// 读取温度
+	// Read temperature
 	statusCode = FSUS_ReadData(servo_usart, servo_id, FSUS_PARAM_TEMPRATURE, (uint8_t *)&value, &dataSize);
 	if (statusCode == FSUS_STATUS_SUCCESS)
 	{
@@ -352,19 +352,19 @@ void FSUSExample_ReadData(void)
 	{
 		printf("fail\r\n");
 	}
-	// 读取工作状态
+	// Read working status
 	statusCode = FSUS_ReadData(servo_usart, servo_id, FSUS_PARAM_SERVO_STATUS, (uint8_t *)&value, &dataSize);
 	if (statusCode == FSUS_STATUS_SUCCESS)
 	{
-		// 舵机工作状态标志位
-		// BIT[0] - 执行指令置1，执行完成后清零。
-		// BIT[1] - 执行指令错误置1，在下次正确执行后清零。
-		// BIT[2] - 堵转错误置1，解除堵转后清零。
-		// BIT[3] - 电压过高置1，电压恢复正常后清零。
-		// BIT[4] - 电压过低置1，电压恢复正常后清零。
-		// BIT[5] - 电流错误置1，电流恢复正常后清零。
-		// BIT[6] - 功率错误置1，功率恢复正常后清零。
-		// BIT[7] - 温度错误置1，温度恢复正常后清零。
+		// Servo working status flags
+		// BIT[0] - Command execution flag, set to 1 when executing, cleared after completion.
+		// BIT[1] - Command execution error flag, cleared after next correct execution.
+		// BIT[2] - Stall error flag, cleared after stall is resolved.
+		// BIT[3] - Overvoltage flag, cleared when voltage returns to normal.
+		// BIT[4] - Undervoltage flag, cleared when voltage returns to normal.
+		// BIT[5] - Current error flag, cleared when current returns to normal.
+		// BIT[6] - Power error flag, cleared when power returns to normal.
+		// BIT[7] - Temperature error flag, cleared when temperature returns to normal.
 
 		if ((value >> 3) & 0x01)
 			printf("read sucess, voltage too high\r\n");
@@ -377,60 +377,60 @@ void FSUSExample_ReadData(void)
 	}
 	printf("================================= \r\n");
 
-	// 死循环
+	// Infinite loop
 	while (1)
 	{
 	}
 }
 
-/* 用户自定义数据-写入 */
+/* User-defined Data - Write */
 void FSUSExample_WriteData(void)
 {
-	uint8_t servo_id = 0;	 // 连接在转接板上的总线伺服舵机ID号
-	FSUS_STATUS status_code; // 状态码
-	// 限位角度
-	float angle_limit_high = 90.0;	   // 舵机角度上限 (默认值 180)
-	float angle_limit_low = -90.0;	   // 舵机角度下限 (默认值-180)
-	uint8_t angle_limit_switch = 0x01; // 0x01: 开启限位; 0x00: 关闭限位
+	uint8_t servo_id = 0;	 // Servo ID number connected to the transceiver board
+	FSUS_STATUS status_code; // Status code
+	// Angle limit
+	float angle_limit_high = 90.0;	   // Servo angle upper limit (default 180)
+	float angle_limit_low = -90.0;	   // Servo angle lower limit (default -180)
+	uint8_t angle_limit_switch = 0x01; // 0x01: Enable limit; 0x00: Disable limit
 
 	uint16_t value;
 
-	// 写入舵机角度上限
-	value = (int16_t)(angle_limit_high * 10); // 舵机角度上限 转换单位为0.1度
+	// Write servo angle upper limit
+	value = (int16_t)(angle_limit_high * 10); // Convert servo angle upper limit to 0.1 degree units
 	status_code = FSUS_WriteData(servo_usart, servo_id, FSUS_PARAM_ANGLE_LIMIT_HIGH, (uint8_t *)&value, 2);
 	printf("write angle limit high = %f, status code: %d\r\n", angle_limit_high, status_code);
 
-	// 写入舵机角度下限制
-	value = (int16_t)(angle_limit_low * 10); // 舵机角度下限 转换单位为0.1度
+	// Write servo angle lower limit
+	value = (int16_t)(angle_limit_low * 10); // Convert servo angle lower limit to 0.1 degree units
 	status_code = FSUS_WriteData(servo_usart, servo_id, FSUS_PARAM_ANGLE_LIMIT_LOW, (uint8_t *)&value, 2);
 	printf("write angle limit low = %f, status code: %d\r\n", angle_limit_low, status_code);
 
-	// 打开舵机角度限位开关, 配置生效
+	// Enable servo angle limit switch, configuration takes effect
 	status_code = FSUS_WriteData(servo_usart, servo_id, FSUS_PARAM_ANGLE_LIMIT_LOW, &angle_limit_switch, 1);
 	printf("enable angle limit mode, status code: %d\r\n", status_code);
 
 	while (1)
 	{
-		// 控制舵机角度
+		// Control servo angle
 		FSUS_SetServoAngle(servo_usart, servo_id, 90.0, 2000, 0);
 		FSUS_SetServoAngle(servo_usart, servo_id, -90.0, 2000, 0);
 	}
 }
 
-/* 同步命令控制 */
+/* Synchronous Command Control */
 void FSUSExample_SYNC(void)
 {
-	/*同步命令模式选择
-* 1：设置舵机的角度
-* 2：设置舵机的角度(指定周期)
-* 3：设置舵机的角度(指定转速)
-* 4：设置舵机的角度(多圈模式)
-* 5：设置舵机的角度(多圈模式, 指定周期) 
-* 6：设置舵机的角度(多圈模式, 指定转速)
-* 7：读取舵机的数据*/
-uint8_t sync_mode=1;//同步命令模式
+	/* Synchronous command mode selection
+* 1: Set servo angle
+* 2: Set servo angle (specified period)
+* 3: Set servo angle (specified speed)
+* 4: Set servo angle (multi-turn mode)
+* 5: Set servo angle (multi-turn mode, specified period) 
+* 6: Set servo angle (multi-turn mode, specified speed)
+* 7: Read servo data*/
+uint8_t sync_mode=1;// Synchronous command mode
 
-uint8_t sync_count=5;//舵机数量
+uint8_t sync_count=5;// Number of servos
 
 	while(1)
 	{
@@ -444,10 +444,10 @@ uint8_t sync_count=5;//舵机数量
 		SyncArray[3].id=3;SyncArray[3].interval_single=300;SyncArray[3].interval_multi=1000;SyncArray[3].velocity=100;SyncArray[3].t_acc=100;SyncArray[3].t_dec=100;
 		SyncArray[4].angle=-90;
 		SyncArray[4].id=4;SyncArray[4].interval_single=300;SyncArray[4].interval_multi=1000;SyncArray[4].velocity=100;SyncArray[4].t_acc=100;SyncArray[4].t_dec=100;
-		//发送同步命令控制
+		// Send synchronous command control
 		FSUS_SyncCommand(servo_usart,sync_count,sync_mode,SyncArray);
 		SysTick_DelayMs(1000);
-		//发送同步命令读取
+		// Send synchronous command read
 		FSUS_SyncCommand(servo_usart,sync_count,7,SyncArray);
 		SysTick_DelayMs(200);
 
@@ -456,30 +456,30 @@ uint8_t sync_count=5;//舵机数量
 		SyncArray[2].angle=45;SyncArray[2].interval_single=300;SyncArray[2].velocity=20;
 		SyncArray[3].angle=-45;SyncArray[3].interval_single=300;SyncArray[3].velocity=20;
 		SyncArray[4].angle=-45;SyncArray[4].interval_single=300;SyncArray[4].velocity=20;
-		//发送同步命令控制
+		// Send synchronous command control
 		FSUS_SyncCommand(servo_usart,sync_count,sync_mode,SyncArray);
 		SysTick_DelayMs(1000);
-		//发送同步命令读取
+		// Send synchronous command read
 		FSUS_SyncCommand(servo_usart,sync_count,7,SyncArray);
 		SysTick_DelayMs(200);
 	}
 }
 
-/* 数据监控读取舵机参数 */
+/* Data Monitoring - Read Servo Parameters */
 void FSUSExample_MONTIOR(void)
 {
-	/*数据监控的数据
-* id：舵机的id号
-* voltage：舵机的电压
-* current：舵机的电流
-* power：舵机的执行功率
-* temperature：舵机的温度 
-* status：舵机的状态
-* angle：舵机的角度
-* circle_count：舵机的转动圈数*/
-ServoData servodata_single[1];//读取一个舵机的数据
+	/* Data monitoring data
+* id: Servo ID number
+* voltage: Servo voltage
+* current: Servo current
+* power: Servo operating power
+* temperature: Servo temperature 
+* status: Servo status
+* angle: Servo angle
+* circle_count: Servo rotation count*/
+ServoData servodata_single[1];// Read data for one servo
 
-//要读取的舵机id号
+// Servo ID number to read
 uint8_t servo_id=0;
 	
 	FSUS_DampingMode(servo_usart,servo_id,500);
@@ -501,46 +501,46 @@ uint8_t servo_id=0;
 	}
 }
 
-/* 控制模式停止状态 */
+/* Control Mode Stop State */
 void FSUSExample_StopOnControlMode(void)
 {
-//0-停止后卸力(失锁)
-//1-停止后保持锁力
-//2-停止后进入阻尼状态
+//0-Release after stop (unlock)
+//1-Maintain lock after stop
+//2-Enter damping state after stop
 uint8_t stopcolmode=2;
 	
-float	angle = 135.0;// 舵机的目标角度
-uint16_t interval = 1000;// 时间间隔ms
-uint16_t	power = 500;// 舵机执行功率
-uint8_t servo_id=0;// 舵机的ID号
+float	angle = 135.0;// Servo target angle
+uint16_t interval = 1000;// Time interval in ms
+uint16_t	power = 500;// Servo operating power
+uint8_t servo_id=0;// Servo ID number
 
   FSUS_SetServoAngle(servo_usart, servo_id, angle, interval, power);
 	SysTick_DelayMs(1000);
 	
-	//停止后进入对应状态
+	// Enter corresponding state after stop
 	FSUS_StopOnControlMode(servo_usart, servo_id, stopcolmode, power);
 	SysTick_DelayMs(1000);
 }
 
-/* 开启停止异步 */
+/* Enable Stop Asynchronous */
 void FSUSExample_BEGIN_ENDASYNC(void)
 {
-	// 舵机的ID号
+	// Servo ID number
 	uint8_t servo_id = 0;
-	// 舵机的目标角度
-	// 舵机角度在-180度到180度之间, 最小单位0.1
+	// Servo target angle
+	// Servo angle range is -180 to 180 degrees, minimum unit 0.1
 	float angle;
-	uint32_t interval; // 时间间隔ms
-	uint16_t power = 0;// 舵机执行功率 mV 默认为0
-	float angle_read;// 读取的角度
-	uint8_t async_mode=0; //0:执行存储的命令  1:取消存储的命令
+	uint32_t interval; // Time interval in ms
+	uint16_t power = 0;// Servo operating power in mV, default is 0
+	float angle_read;// Read angle
+	uint8_t async_mode=0; //0: Execute stored command  1: Cancel stored command
 
 
-		//开启异步命令
+		// Enable asynchronous command
 		FSUS_BeginAsync(servo_usart);
 	
 		printf("GOTO: 135.0f\r\n");
-    // 简易角度控制 + 当前角度查询
+    // Simple angle control + current angle query
     angle = 135.0;
     interval = 2000;
     FSUS_SetServoAngle(servo_usart, servo_id, angle, interval, power);
@@ -549,12 +549,10 @@ void FSUSExample_BEGIN_ENDASYNC(void)
 		
 		printf("*******************\n");
 		
-	//发送上面的命令是不会动的，只是存储了命令，之后任意时刻发送停止命令将执行这个命令or取消存储
-	//等待5秒
+	// The above command will not move the servo, it just stores the command, which can be executed or canceled at any time by sending a stop command
+	// Wait for 5 seconds
 		SysTick_DelayMs(5000);
 		
-		//停止异步命令
+		// Stop asynchronous command
 		FSUS_EndAsync(servo_usart,async_mode);
 }
-
-
