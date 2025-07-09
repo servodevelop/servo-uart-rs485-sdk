@@ -10,7 +10,7 @@
 
 上位机软件可以调试总线伺服舵机，测试总线伺服舵机的功能。 
 
-- 上位机软件：[FashionStar UART总线伺服舵机上位机软件](https://fashionrobo.com/wp-content/uploads/download/Develop-US_1.0.4.171.zip)
+- 上位机软件：[FashionStar UART总线伺服舵机上位机软件](https://fashionrobo.com/downloadcenter/)
 
 - 使用说明：[总线伺服舵机上位机软件使用说明](https://wiki.fashionrobo.com/uartbasic/uart-servo-software/)
 
@@ -702,7 +702,7 @@ FSUS_QueryServoAngleMTurn(servoUsart, servoId, &curAngle); // 读取一下舵机
 //curAngle = 当前单圈角度
 ```
 
-### 6.5.清除多圈圈数
+### 6.5.清除当前圈数
 
 **函数原型**
 
@@ -718,7 +718,7 @@ FSUS_STATUS FSUS_ServoAngleReset(Usart_DataTypeDef *usart, uint8_t servo_id);
 
 ```C
 uint8_t servoId = 0;    // 舵机的ID号
-FSUS_ServoAngleReset(servoUsart, servoId); // 清除多圈圈数
+FSUS_ServoAngleReset(servoUsart, servoId); // 清除当前圈数
 ```
 
 
@@ -930,11 +930,11 @@ void FSUSExample_SetServoDamping(void)
 
 
 
-## 8.舵机同步命令
+## 8.舵机同步指令
 
 
 
-### 8.1.同步命令控制舵机
+### 8.1.同步指令控制舵机
 
 **函数原型**
 
@@ -944,14 +944,14 @@ FSUS_STATUS FSUS_SyncCommand(Usart_DataTypeDef *usart, uint8_t servo_count, uint
 
 * `usart` 舵机控制对应的串口数据对象`Usart_DataTypeDef`
 * `servo_count` 舵机同步数量
-* `servomode` 同步命令模式选择
+* `servomode` 同步指令模式选择
 
 * `servoSync[]` 舵机控制参数结构体
 
 **使用示例**
 
 ```c
-/*同步命令模式选择
+/*同步指令模式选择
 * 1：设置舵机的角度
 * 2：设置舵机的角度(指定周期)
 * 3：设置舵机的角度(指定转速)
@@ -959,7 +959,7 @@ FSUS_STATUS FSUS_SyncCommand(Usart_DataTypeDef *usart, uint8_t servo_count, uint
 * 5：设置舵机的角度(多圈模式, 指定周期) 
 * 6：设置舵机的角度(多圈模式, 指定转速)
 * 7：读取舵机的数据*/
-uint8_t sync_mode=1;//同步命令模式
+uint8_t sync_mode=1;//同步指令模式
 
 uint8_t sync_count=5;//舵机数量
 
@@ -982,7 +982,7 @@ FSUS_SyncCommand(servo_usart, servo_count, servomode, servoSyncArray);
 
 
 
-### 8.2.例程-同步命令
+### 8.2.例程-同步指令
 
 
 
@@ -997,7 +997,7 @@ FSUS_SyncCommand(servo_usart, servo_count, servomode, servoSyncArray);
 ```c
 void FSUSExample_SYNC(void)
 {
-	/*同步命令模式选择
+	/*同步指令模式选择
 * 1：设置舵机的角度
 * 2：设置舵机的角度(指定周期)
 * 3：设置舵机的角度(指定转速)
@@ -1005,7 +1005,7 @@ void FSUSExample_SYNC(void)
 * 5：设置舵机的角度(多圈模式, 指定周期) 
 * 6：设置舵机的角度(多圈模式, 指定转速)
 * 7：读取舵机的数据*/
-uint8_t sync_mode=1;//同步命令模式
+uint8_t sync_mode=1;//同步指令模式
 
 uint8_t sync_count=5;//舵机数量
 
@@ -1020,10 +1020,10 @@ uint8_t sync_count=5;//舵机数量
 		SyncArray[3].id=3;SyncArray[3].interval_single=0;SyncArray[3].interval_multi=1000;SyncArray[3].velocity=100;SyncArray[3].t_acc=100;SyncArray[3].t_dec=100;
 		SyncArray[4].angle=-90;
 		SyncArray[4].id=4;SyncArray[4].interval_single=0;SyncArray[4].interval_multi=1000;SyncArray[4].velocity=100;SyncArray[4].t_acc=100;SyncArray[4].t_dec=100;
-		//发送同步命令控制
+		//发送同步指令控制
 		FSUS_SyncCommand(servo_usart,sync_count,sync_mode,SyncArray);
 		SysTick_DelayMs(1000);
-		//发送同步命令读取
+		//发送同步指令读取
 		FSUS_SyncCommand(servo_usart,sync_count,7,SyncArray);
 		SysTick_DelayMs(200);
 
@@ -1032,18 +1032,16 @@ uint8_t sync_count=5;//舵机数量
 		SyncArray[2].angle=45;SyncArray[2].interval_single=0;SyncArray[2].velocity=20;
 		SyncArray[3].angle=-45;SyncArray[3].interval_single=0;SyncArray[3].velocity=20;
 		SyncArray[4].angle=-45;SyncArray[4].interval_single=0;SyncArray[4].velocity=20;
-		//发送同步命令控制
+		//发送同步指令控制
 		FSUS_SyncCommand(servo_usart,sync_count,sync_mode,SyncArray);
 		SysTick_DelayMs(1000);
-		//发送同步命令读取
+		//发送同步指令读取
 		FSUS_SyncCommand(servo_usart,sync_count,7,SyncArray);
 		SysTick_DelayMs(200);
 }
 ```
 
 
-
-### 
 
 ## 9.舵机数据监控
 
@@ -1119,7 +1117,6 @@ uint8_t servo_id=0;
 			SysTick_DelayMs(1000);
 
 }
-
 ```
 
 
@@ -1241,12 +1238,12 @@ FSUS_ResetUserData(servoUsart, servoId);
 	// 舵机工作状态标志位
 	// BIT[0] - 执行指令置1，执行完成后清零。
 	// BIT[1] - 执行指令错误置1，在下次正确执行后清零。
-	// BIT[2] - 堵转错误置1，解除堵转后清零。
+	// BIT[2] - 堵转保护置1，解除堵转后清零。
 	// BIT[3] - 电压过高置1，电压恢复正常后清零。
 	// BIT[4] - 电压过低置1，电压恢复正常后清零。
-	// BIT[5] - 电流错误置1，电流恢复正常后清零。
-	// BIT[6] - 功率错误置1，功率恢复正常后清零。
-	// BIT[7] - 温度错误置1，温度恢复正常后清零。
+	// BIT[5] - 电流保护置1，电流恢复正常后清零。
+	// BIT[6] - 功率保护置1，功率恢复正常后清零。
+	// BIT[7] - 温度保护置1，温度恢复正常后清零。
 ```
 
 **源代码**
@@ -1320,12 +1317,12 @@ void FSUSExample_ReadData(void)
 		// 舵机工作状态标志位
 		// BIT[0] - 执行指令置1，执行完成后清零。
 		// BIT[1] - 执行指令错误置1，在下次正确执行后清零。
-		// BIT[2] - 堵转错误置1，解除堵转后清零。
+		// BIT[2] - 堵转保护置1，解除堵转后清零。
 		// BIT[3] - 电压过高置1，电压恢复正常后清零。
 		// BIT[4] - 电压过低置1，电压恢复正常后清零。
-		// BIT[5] - 电流错误置1，电流恢复正常后清零。
-		// BIT[6] - 功率错误置1，功率恢复正常后清零。
-		// BIT[7] - 温度错误置1，温度恢复正常后清零。
+		// BIT[5] - 电流保护置1，电流恢复正常后清零。
+		// BIT[6] - 功率保护置1，功率恢复正常后清零。
+		// BIT[7] - 温度保护置1，温度恢复正常后清零。
 
 		if ((value >> 3) & 0x01)
 			printf("read sucess, voltage too high\r\n");
@@ -1362,7 +1359,7 @@ read success, voltage too high                 //如果当前电压超过舵机�
 
 
 
-## 11.控制模式停止指令
+## 11.停止指令
 
 </td></tr></table><table><tr><td bgcolor=#DDDDDD>
 
@@ -1386,7 +1383,7 @@ FSUS_STATUS FSUS_StopOnControlMode(Usart_DataTypeDef *usart, uint8_t servo_id, u
 **使用示例**
 
 ```c
-/* 舵机控制模式停止指令*/
+/* 停止指令*/
 //mode 指令停止形式
 //0-停止后卸力(失锁)
 //1-停止后保持锁力
@@ -1397,13 +1394,13 @@ uint16_t power = 500;  //功率
 FSUS_StopOnControlMode(servoUsart, servo_id, stopcolmode, power);
 ```
 
-### 11.1.例程-控制模式停止状态
+### 11.1.例程-停止指令
 
 
 
 **功能简介**
 
-执行完控制指令进入阻尼状态
+执行完指令进入阻尼状态
 
 
 
@@ -1464,9 +1461,9 @@ FSUS_SetOriginPoint(servoUsart, servoId); // 设置当前舵机角度为原点
 
 
 
-## 13.开启停止异步模式
+## 13.异步指令
 
-### 13.1.开启异步
+### 13.1.异步写入指令
 
 **函数原型**
 
@@ -1482,7 +1479,7 @@ FSUS_STATUS FSUS_BeginAsync(Usart_DataTypeDef *usart)；
 FSUS_BeginAsync(servo_usart);
 ```
 
-### 13.2.停止异步
+### 13.2.异步执行指令
 
 **函数原型**
 
@@ -1491,7 +1488,7 @@ FSUS_STATUS FSUS_EndAsync(Usart_DataTypeDef *usart,uint8_t mode)；
 ```
 
 * `usart` 舵机控制对应的串口数据对象`Usart_DataTypeDef`
-* `mode` 舵机停止异步的模式
+* `mode` 舵机异步执行的模式
 
 **使用示例**
 
@@ -1500,13 +1497,13 @@ uint8_t async_mode=0; //0:执行存储的命令  1:取消存储的命令
 FSUS_EndAsync(servo_usart,async_mode);
 ```
 
-### 13.3.例程-开启停止异步命令
+### 13.3.例程-异步指令
 
 
 
 **功能简介**
 
-存储一次命令
+存储一次指令
 
 
 
@@ -1526,7 +1523,7 @@ void FSUSExample_BEGIN_ENDASYNC(void)
 	uint8_t async_mode=0; //0:执行存储的命令  1:取消存储的命令
 
 
-		//开启异步命令
+		//异步写入
 		FSUS_BeginAsync(servo_usart);
 	
 		printf("GOTO: 135.0f\r\n");
@@ -1543,7 +1540,7 @@ void FSUSExample_BEGIN_ENDASYNC(void)
 	//等待5秒
 		SysTick_DelayMs(5000);
 		
-		//停止异步命令
+		//异步执行
 		FSUS_EndAsync(servo_usart,async_mode);
 }
 ```
@@ -1560,7 +1557,7 @@ void FSUSExample_BEGIN_ENDASYNC(void)
 |    2    | current                | 舵机电流               | uint16_t      | 2             |                                                              | mA   |
 |    3    | power                  | 舵机功率               | uint16_t      | 2             |                                                              | mW   |
 |    4    | temprature             | 舵机温度               | uint16_t      | 2             |                                                              | ADC  |
-|    5    | servo_status           | 舵机工作状态           | uint8_t       | 1             | BIT[0] - 执行指令置1，执行完成后清零。<br>BIT[1] - 执行指令错误置1，在下次正确执行后清零。<br>BIT[2] - 堵转错误置1，解除堵转后清零。<br>BIT[3] - 电压过高置1，电压恢复正常后清零。<br>BIT[4] - 电压过低置1，电压恢复正常后清零。<br>BIT[5] - 电流错误置1，电流恢复正常后清零。<br>BIT[6] - 功率错误置1，功率恢复正常后清零。<br>BIT[7] - 温度错误置1，温度恢复正常后清零。 |      |
+|    5    | servo_status           | 舵机工作状态           | uint8_t       | 1             | BIT[0] - 执行指令置1，执行完成后清零。<br>BIT[1] - 执行指令错误置1，在下次正确执行后清零。<br>BIT[2] - 堵转保护置1，解除堵转后清零。<br>BIT[3] - 电压过高置1，电压恢复正常后清零。<br>BIT[4] - 电压过低置1，电压恢复正常后清零。<br>BIT[5] - 电流保护置1，电流恢复正常后清零。<br>BIT[6] - 功率保护置1，功率恢复正常后清零。<br>BIT[7] - 温度保护置1，温度恢复正常后清零。 |      |
 |    6    | servo_type             | 舵机型号               | uint16_t      | 2             |                                                              |      |
 |    7    | firmware_version       | 舵机固件版本           | uint16_t      | 2             |                                                              |      |
 |    8    | serial_number          | 舵机序列号             | uint32_t      | 4             | 舵机序列号(serial_number)并不是舵机ID，它是舵机的唯一识别符。 |      |
@@ -1571,10 +1568,8 @@ void FSUSExample_BEGIN_ENDASYNC(void)
 
 | address | 参数<br/>名称<br/>(en) | 参数<br/>名称<br/>(cn) | 字节<br>类型 | 字节<br/>长度 | 说明                                                         | 单位  |
 | :-----: | ---------------------- | ---------------------- | ------------ | ------------- | ------------------------------------------------------------ | ----- |
-|   32    |                        | <预留>                 | uint8_t      |               |                                                              |       |
 |   33    | response_switch        | 响应开关               | uint8_t      | 1             | 0 - 舵机控制指令执行可以被中断，新的指令覆盖旧的指令，无反馈数据 <br>1 - 舵机控制指令不可以被中断，指令执行结束之后发送反馈数据 |       |
 |   34    | servo_id               | 舵机ID                 | uint8_t      | 1             | 舵机的ID号初始默认设置为0。修改此值可以修改舵机的ID号        |       |
-|   35    |                        | <预留>                 | uint8_t      |               |                                                              |       |
 |   36    | baudrate               | 波特率选项             | uint8_t      | 1             | 1 - 9600<br>2 - 19200<br>3 - 38400<br>4 - 57600<br>5 - 115200<br>6 - 250000<br>7 - 500000<br>8 - 1000000 |       |
 |   37    | stall_protect_mode     | 舵机堵转保护模式       | uint8_t      | 1             | 0 - 将舵机功率降低到功率上限<br>1 - 释放舵机锁力（舵机卸力） |       |
 |   38    | stall_power_limit      | 舵机堵转功率上限       | uint16_t     | 2             |                                                              | mW    |
@@ -1583,8 +1578,7 @@ void FSUSExample_BEGIN_ENDASYNC(void)
 |   41    | over_temprature        | 温度上限               | uint16_t     | 2             | 见附表3                                                      | ADC   |
 |   42    | over_power             | 功率上限               | uint16_t     | 2             |                                                              | mW    |
 |   43    | over_current           | 电流上限               | uint16_t     | 2             |                                                              | mA    |
-|   44    | accel_switch           | 加速度处理开关         | uint8_t      | 1             | 舵机目前必须设置启用加速度处理，即只能设置0x01这个选项。     |       |
-|   45    |                        | <预留>                 | uint8_t      | 1             |                                                              |       |
+|   44    | accel_switch           | 加速度                 | uint8_t      | 1             | 舵机目前必须设置启用加速度处理，即只能设置0x01这个选项。     |       |
 |   46    | po_lock_switch         | 舵机上电锁力开关       | uint8_t      | 1             | 0 - 上电舵机释放锁力<br>1 - 上电舵机保持锁力                 |       |
 |   47    | wb_lock_switch         | 轮式刹车锁力开关       | uint8_t      | 1             | 0 - 停止时释放舵机锁力<br>1 - 停止时保持舵机锁力             |       |
 |   48    | angle_limit_switch     | 角度限制开关           | uint8_t      | 1             | 0 - 关闭角度限制<br>1 - 开启角度限制                         |       |

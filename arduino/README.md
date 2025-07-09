@@ -1756,3 +1756,863 @@ void loop()
 }
 ```
 
+## 17.重设多圈角度
+
+</td></tr></table><table><tr><td bgcolor=#DDDDDD>
+
+**注意事项**：
+
+- 仅适用于磁编码舵机
+- 需要在失锁状态下使用本API
+
+</td></tr></table>
+
+
+
+### 17.1.  API-`ResetMultiTurnAngle`
+
+**函数原型**
+
+```c++
+void FSUS_Servo::ResetMultiTurnAngle();
+```
+
+**输入参数**
+
+-  <无>
+
+**返回参数**
+
+- <无>
+
+
+
+### 17.2.示例源码
+
+`servo_reset_multiturn_angle.ino`
+
+```c++
+/* 
+ * 舵机重设多圈角度
+ * 提示: 拓展板上电之后, 记得按下Arduino的RESET按键
+ * --------------------------
+ * 作者: 深圳市华馨京科技有限公司
+ * 网站：https://fashionrobo.com/
+ * 更新时间: 2024/12/17
+ */
+
+#include "FashionStar_UartServoProtocol.h"
+#include "FashionStar_UartServo.h" // Fashion Star总线伺服舵机的依赖
+
+
+// 串口总线舵机配置参数
+#define SERVO_ID 0 //舵机ID号
+#define BAUDRATE 115200 // 波特率
+
+// 调试串口的配置
+#if defined(ARDUINO_AVR_UNO)
+    #include <SoftwareSerial.h>
+    #define SOFT_SERIAL_RX 6 
+    #define SOFT_SERIAL_TX 7
+    SoftwareSerial softSerial(SOFT_SERIAL_RX, SOFT_SERIAL_TX); // 创建软串口
+    #define DEBUG_SERIAL softSerial
+    #define DEBUG_SERIAL_BAUDRATE 115200
+    
+
+    #elif defined(ARDUINO_AVR_MEGA2560)
+    #define DEBUG_SERIAL Serial
+    #define DEBUG_SERIAL_BAUDRATE 115200
+    
+#elif defined(ARDUINO_ARCH_ESP32)
+    #define DEBUG_SERIAL Serial
+    #define DEBUG_SERIAL_BAUDRATE 115200
+    
+#elif defined(ARDUINO_ARCH_STM32)
+    #include <HardwareSerial.h>
+    //                      RX    TX
+    HardwareSerial Serial1(PA10, PA9);
+    //HardwareSerial Serial2(PA3, PA2); //这里串口2不需要定义
+    HardwareSerial Serial3(PB11, PB10);
+    #define DEBUG_SERIAL Serial1
+    #define DEBUG_SERIAL_BAUDRATE (uint32_t)115200
+    
+#endif 
+
+FSUS_Protocol protocol(BAUDRATE); //协议
+FSUS_Servo uservo(SERVO_ID, &protocol); // 创建舵机
+
+uint32_t interval;  // 运行周期 单位ms 
+uint16_t t_acc;     // 加速时间 单位ms
+uint16_t t_dec;     // 减速时间 单位ms
+float velocity;         // 目标转速 单位°/s
+
+/* 等待并报告当前的角度*/
+void waitAndReport(){          // 等待舵机旋转到目标角度
+    DEBUG_SERIAL.println("Real Angle = " + String(uservo.curRawAngle, 1) + " Target Angle = "+String(uservo.targetRawAngle, 1));
+    delay(5000); // 暂停2s
+}
+
+void setup(){
+    protocol.init(); // 通信协议初始化
+    uservo.init(); //舵机角度初始化
+    // 打印例程信息
+   DEBUG_SERIAL.begin(DEBUG_SERIAL_BAUDRATE); // 初始化软串口的波特率
+   DEBUG_SERIAL.println("Set Servo Angle");
+}
+
+void loop(){
+
+   uservo.setRawAngleMTurn(1000.0);  // 设置舵机的角度
+   delay(7000);
+   uservo.queryRawAngleMTurn();      //读取角度
+    // 日志输出
+    String message = "Status Code: " + String(uservo.protocol->responsePack.recv_status, DEC) + " servo #"+String(uservo.servoId, DEC) + " , Current Angle = "+String(uservo.curRawAngle, 1)+" deg";
+    DEBUG_SERIAL.println(message);
+    // 等待1s
+    delay(1000);
+    uservo.StopOnControlUnloading(); //停止舵机（重置多圈需要在舵机停止状态）
+    delay(10); 
+    uservo.ResetMultiTurnAngle();   //重置多圈
+    delay(10);
+    uservo.queryRawAngleMTurn();    //读取角度
+    message = "Status Code: " + String(uservo.protocol->responsePack.recv_status, DEC) + " servo #"+String(uservo.servoId, DEC) + " , Current Angle = "+String(uservo.curRawAngle, 1)+" deg";
+    DEBUG_SERIAL.println(message);
+    // 等待1s
+    delay(1000);
+
+    uservo.setRawAngleMTurn(-1000.0);  // 设置舵机的角度
+    delay(7000);
+    uservo.queryRawAngleMTurn(); 
+    // 日志输出
+    message = "Status Code: " + String(uservo.protocol->responsePack.recv_status, DEC) + " servo #"+String(uservo.servoId, DEC) + " , Current Angle = "+String(uservo.curRawAngle, 1)+" deg";
+    DEBUG_SERIAL.println(message);
+    // 等待1s
+    delay(1000);
+    uservo.StopOnControlUnloading();
+    delay(10); 
+    uservo.ResetMultiTurnAngle();
+    delay(10);
+    uservo.queryRawAngleMTurn(); 
+    message = "Status Code: " + String(uservo.protocol->responsePack.recv_status, DEC) + " servo #"+String(uservo.servoId, DEC) + " , Current Angle = "+String(uservo.curRawAngle, 1)+" deg";
+    DEBUG_SERIAL.println(message);
+    // 等待1s
+    delay(1000);
+
+}
+```
+
+## 18.异步命令
+
+</td></tr></table><table><tr><td bgcolor=#DDDDDD>
+
+**注意事项**：
+
+- **仅适用于无刷磁编码舵机V316及之后的版本**
+
+</td></tr></table>
+
+
+
+### 18.1.  API
+
+**函数原型**
+
+```c++
+void FSUS_Servo::BeginAsync();	//开始异步指令
+
+void FSUS_Servo::EndAsync(uint8_t cancel);  // 结束异步指令
+```
+
+**输入参数**
+
+**·** `cancel` ：0 执行；1 取消
+
+**返回参数**
+
+- <无>
+
+
+
+### 18.2.示例源码
+
+`servo_async.ino`
+
+```c++
+/* 
+ * 舵机异步命令
+ * 提示: 拓展板上电之后, 记得按下Arduino的RESET按键
+ * --------------------------
+ * 作者: 深圳市华馨京科技有限公司
+ * 网站：https://fashionrobo.com/
+ * 更新时间: 2024/12/17
+ */
+
+#include "FashionStar_UartServoProtocol.h"
+#include "FashionStar_UartServo.h" // Fashion Star总线伺服舵机的依赖
+
+
+// 串口总线舵机配置参数
+#define SERVO_ID 3 //舵机ID号
+#define BAUDRATE 115200 // 波特率
+
+// 调试串口的配置
+#if defined(ARDUINO_AVR_UNO)
+    #include <SoftwareSerial.h>
+    #define SOFT_SERIAL_RX 6 
+    #define SOFT_SERIAL_TX 7
+    SoftwareSerial softSerial(SOFT_SERIAL_RX, SOFT_SERIAL_TX); // 创建软串口
+    #define DEBUG_SERIAL softSerial
+    #define DEBUG_SERIAL_BAUDRATE 115200
+    
+
+    #elif defined(ARDUINO_AVR_MEGA2560)
+    #define DEBUG_SERIAL Serial
+    #define DEBUG_SERIAL_BAUDRATE 115200
+    
+#elif defined(ARDUINO_ARCH_ESP32)
+    #define DEBUG_SERIAL Serial
+    #define DEBUG_SERIAL_BAUDRATE 115200
+    
+#elif defined(ARDUINO_ARCH_STM32)
+    #include <HardwareSerial.h>
+    //                      RX    TX
+    HardwareSerial Serial1(PA10, PA9);
+    //HardwareSerial Serial2(PA3, PA2); //这里串口2不需要定义
+    HardwareSerial Serial3(PB11, PB10);
+    #define DEBUG_SERIAL Serial1
+    #define DEBUG_SERIAL_BAUDRATE (uint32_t)115200
+    
+#endif 
+
+FSUS_Protocol protocol(BAUDRATE); //协议
+FSUS_Servo uservo(SERVO_ID, &protocol); // 创建舵机
+
+/* 等待并报告当前的角度*/
+void waitAndReport(){
+    uservo.wait();          // 等待舵机旋转到目标角度
+    DEBUG_SERIAL.println("Real Angle = " + String(uservo.curRawAngle, 1) + " Target Angle = "+String(uservo.targetRawAngle, 1));
+    delay(2000); // 暂停2s
+}
+
+void setup(){
+    protocol.init(); // 通信协议初始化
+    uservo.init(); //舵机角度初始化
+    // 打印例程信息
+   DEBUG_SERIAL.begin(DEBUG_SERIAL_BAUDRATE); // 初始化软串口的波特率
+   DEBUG_SERIAL.println("Set Servo Angle");
+}
+
+void loop(){
+
+    float angle; 
+    uservo.setRawAngle(0.0);    // 设置舵机的角度      
+    uservo.BeginAsync();        //开始异步指令
+    delay(1000);
+    uservo.setRawAngle(90.0);   // 存入设置舵机角度
+    /*支持存入命令：
+     设置舵机原始角度
+     设置舵机的原始角度(指定周期)
+     设定舵机的原始角度(指定转速)
+     设定舵机的原始角度(多圈)
+     设定舵机的原始角度(多圈+指定周期)
+     设定舵机的原始角度(多圈+指定转速)
+    */
+    delay(1000);
+    uservo.EndAsync(0);         //结束异步，执行存入的指令
+    delay(1000);
+
+    uservo.BeginAsync();        //开始异步指令
+    delay(1000);
+    uservo.setRawAngle(180.0);   // 存入设置舵机角度
+    delay(1000);
+    uservo.EndAsync(1);         //结束异步，执行存入的指令
+    delay(1000);
+
+}
+
+```
+
+## 19.数据监控
+
+</td></tr></table><table><tr><td bgcolor=#DDDDDD>
+
+**注意事项**：
+
+- **仅适用于无刷磁编码舵机V316及之后的版本**
+
+</td></tr></table>
+
+
+
+### 19.1.  API
+
+**函数原型**
+
+```c++
+ServoMonitorData FSUS_Servo::ServoMonitor();
+```
+
+**输入参数**
+
+- <无>
+
+**返回参数**
+
+舵机的数据
+
+
+
+### 19.2.示例源码
+
+`servo_monitor.ino`
+
+```c++
+/* 
+ * 舵机数据监控
+ * 提示: 拓展板上电之后, 记得按下Arduino的RESET按键
+ * --------------------------
+ * 作者: 深圳市华馨京科技有限公司
+ * 网站：https://fashionrobo.com/
+ * 更新时间: 2024/12/17
+ */
+
+#include "FashionStar_UartServoProtocol.h"
+#include "FashionStar_UartServo.h" // Fashion Star总线伺服舵机的依赖
+
+
+// 串口总线舵机配置参数
+#define SERVO_ID 0 //舵机ID号
+#define BAUDRATE 115200 // 波特率
+
+// 调试串口的配置
+#if defined(ARDUINO_AVR_UNO)
+    #include <SoftwareSerial.h>
+    #define SOFT_SERIAL_RX 6 
+    #define SOFT_SERIAL_TX 7
+    SoftwareSerial softSerial(SOFT_SERIAL_RX, SOFT_SERIAL_TX); // 创建软串口
+    #define DEBUG_SERIAL softSerial
+    #define DEBUG_SERIAL_BAUDRATE 115200
+    
+
+    #elif defined(ARDUINO_AVR_MEGA2560)
+    #define DEBUG_SERIAL Serial
+    #define DEBUG_SERIAL_BAUDRATE 115200
+    
+#elif defined(ARDUINO_ARCH_ESP32)
+    #define DEBUG_SERIAL Serial
+    #define DEBUG_SERIAL_BAUDRATE 115200
+    
+#elif defined(ARDUINO_ARCH_STM32)
+    #include <HardwareSerial.h>
+    //                      RX    TX
+    HardwareSerial Serial1(PA10, PA9);
+    //HardwareSerial Serial2(PA3, PA2); //这里串口2不需要定义
+    HardwareSerial Serial3(PB11, PB10);
+    #define DEBUG_SERIAL Serial1
+    #define DEBUG_SERIAL_BAUDRATE (uint32_t)115200
+    
+#endif 
+
+FSUS_Protocol protocol(BAUDRATE); //协议
+FSUS_Servo uservo(SERVO_ID, &protocol); // 创建舵机
+
+
+uint16_t Voltage;
+uint16_t Current;
+uint16_t Power;
+uint16_t Temperature;
+uint8_t Status;
+float Angle;
+uint8_t Turns;
+
+/* 等待并报告当前的角度*/
+void waitAndReport(){
+    uservo.wait();          // 等待舵机旋转到目标角度
+    DEBUG_SERIAL.println("Real Angle = " + String(uservo.curRawAngle, 1) + " Target Angle = "+String(uservo.targetRawAngle, 1));
+    delay(2000); // 暂停2s
+}
+
+void setup(){
+    protocol.init(); // 通信协议初始化
+    uservo.init(); //舵机角度初始化
+    // 打印例程信息
+   DEBUG_SERIAL.begin(DEBUG_SERIAL_BAUDRATE); // 初始化软串口的波特率
+   DEBUG_SERIAL.println("Set Servo Angle");
+}
+
+void loop(){
+
+ServoMonitorData data = uservo.ServoMonitor();
+
+    // 打印舵机监控数据
+    if (data.isValid) {
+        DEBUG_SERIAL.println("Servo Monitor Data (Valid):");
+        DEBUG_SERIAL.print("Servo ID: ");
+        DEBUG_SERIAL.println(data.servoId);
+        DEBUG_SERIAL.print("Voltage: ");
+        DEBUG_SERIAL.println(data.voltage);
+        DEBUG_SERIAL.print("Current: ");
+        DEBUG_SERIAL.println(data.current);
+        DEBUG_SERIAL.print("Power: ");
+        DEBUG_SERIAL.println(data.power);
+        DEBUG_SERIAL.print("Temperature: ");
+        DEBUG_SERIAL.println(data.temperature);
+        DEBUG_SERIAL.print("Status: ");
+        DEBUG_SERIAL.println(data.status);
+        DEBUG_SERIAL.print("Angle: ");
+        DEBUG_SERIAL.println(data.angle);
+        DEBUG_SERIAL.print("Turns: ");
+        DEBUG_SERIAL.println(data.turns);
+        delay(2000);
+    } else {
+        DEBUG_SERIAL.println("Failed to receive valid servo data.");
+        delay(2000);
+    }
+}
+```
+
+日志输出
+
+
+
+```
+Servo Monitor Data (Valid):
+Servo ID: 0
+Voltage: 12051.00
+Current: 30.00
+Power: 361.00
+Temperature: 2015.00
+Status: 0
+Angle: 4999.90
+Turns: 13.00
+```
+
+## 20.控制模式停止指令
+
+</td></tr></table><table><tr><td bgcolor=#DDDDDD>
+
+**注意事项**：
+
+- **仅适用于无刷磁编码舵机V316及之后的版本**
+
+</td></tr></table>
+
+
+
+### 20.1.  API
+
+**函数原型**
+
+```c++
+void StopOnControlMode(uint8_t method, uint16_t power);// 控制模式停止指令
+    
+void StopOnControlUnloading();// 控制模式停止指令-卸力（失锁）
+   
+void StopOnControlKeep(uint16_t power); // 控制模式停止指令-锁力
+    
+void StopOnControlDammping(uint16_t power);// 控制模式停止指令-阻尼
+```
+
+**输入参数**
+
+**·** `method` ：停止指令执行方式
+
+​					0x10-停止后卸力(失锁)
+
+​					0x11-停止后保持锁力
+
+​					0x12-停止后进入阻尼状态
+
+**·** `power` ：扭矩开关后功率
+
+​					单位：mW，如果为 0 或大于功率保护值，则按功率保护值操作。
+
+**返回参数**
+
+- <无>
+
+
+
+### 20.2.示例源码
+
+`servo_stop.ino`
+
+```c++
+/* 
+ * 设置舵机的角度（多圈）-停止
+ * 提示: 拓展板上电之后, 记得按下Arduino的RESET按键
+ * --------------------------
+ * 作者: 深圳市华馨京科技有限公司
+ * 网站：https://fashionrobo.com/
+ * 更新时间: 2024/12/17
+ */
+
+#include "FashionStar_UartServoProtocol.h"
+#include "FashionStar_UartServo.h" // Fashion Star总线伺服舵机的依赖
+
+
+// 串口总线舵机配置参数
+#define SERVO_ID 1 //舵机ID号
+#define BAUDRATE 115200 // 波特率
+
+// 调试串口的配置
+#if defined(ARDUINO_AVR_UNO)
+    #include <SoftwareSerial.h>
+    #define SOFT_SERIAL_RX 6 
+    #define SOFT_SERIAL_TX 7
+    SoftwareSerial softSerial(SOFT_SERIAL_RX, SOFT_SERIAL_TX); // 创建软串口
+    #define DEBUG_SERIAL softSerial
+    #define DEBUG_SERIAL_BAUDRATE 115200
+    
+#elif defined(ARDUINO_AVR_MEGA2560)
+    #define DEBUG_SERIAL Serial
+    #define DEBUG_SERIAL_BAUDRATE 115200
+    
+#elif defined(ARDUINO_ARCH_ESP32)
+    #define DEBUG_SERIAL Serial
+    #define DEBUG_SERIAL_BAUDRATE 115200
+    
+#elif defined(ARDUINO_ARCH_STM32)
+    #include <HardwareSerial.h>
+    //                      RX    TX
+    HardwareSerial Serial1(PA10, PA9);
+    //HardwareSerial Serial2(PA3, PA2); //这里串口2不需要定义
+    HardwareSerial Serial3(PB11, PB10);
+    #define DEBUG_SERIAL Serial1
+    #define DEBUG_SERIAL_BAUDRATE (uint32_t)115200
+    
+#endif 
+
+FSUS_Protocol protocol(BAUDRATE); //协议
+FSUS_Servo uservo(SERVO_ID, &protocol); // 创建舵机
+
+uint32_t interval;  // 运行周期 单位ms 
+uint16_t t_acc;     // 加速时间 单位ms
+uint16_t t_dec;     // 减速时间 单位ms
+float velocity;         // 目标转速 单位°/s
+
+/* 等待并报告当前的角度*/
+void waitAndReport(){
+    uservo.wait();          // 等待舵机旋转到目标角度
+    DEBUG_SERIAL.println("Real Angle = " + String(uservo.curRawAngle, 1) + " Target Angle = "+String(uservo.targetRawAngle, 1));
+    delay(2000); // 暂停2s
+}
+
+void setup(){
+    protocol.init(); // 通信协议初始化
+    uservo.init(); //舵机角度初始化
+    // 打印例程信息
+    DEBUG_SERIAL.begin(DEBUG_SERIAL_BAUDRATE); // 初始化软串口的波特率
+    DEBUG_SERIAL.println("Set Servo Angle");
+}
+
+void loop(){
+
+    DEBUG_SERIAL.println("Set Angle = 10000° ,StopOnControlUnloading\r\n");
+    interval = 500;
+    t_acc = 100;
+    t_dec = 100;
+    uservo.setRawAngleMTurnByInterval(10000, interval, t_acc, t_dec, 0);
+    delay(2000); // 暂停2s
+    uservo.StopOnControlUnloading();//停止失锁，可掰动
+    delay(5000);
+
+    DEBUG_SERIAL.println("Set Angle = -10000° ,StopOnControlKeep\r\n");
+    interval = 500;
+    t_acc = 100;
+    t_dec = 100;
+    uservo.setRawAngleMTurnByInterval(-10000, interval, t_acc, t_dec, 0);
+    delay(2000); // 暂停2s
+    uservo.StopOnControlKeep(100);//停止锁止，无法掰动
+    delay(5000);
+
+    DEBUG_SERIAL.println("Set Angle = 10000° ,StopOnControlKeep\r\n");
+    interval = 500;
+    t_acc = 100;
+    t_dec = 100;
+    uservo.setRawAngleMTurnByInterval(10000, interval, t_acc, t_dec, 0);
+    delay(2000); // 暂停2s
+    uservo.StopOnControlDammping(500);//停止阻尼，可掰动（有阻尼感）
+    delay(5000);
+
+    DEBUG_SERIAL.println("Set Angle = -10000° ,StopOnControlKeep\r\n");
+    interval = 500;
+    t_acc = 100;
+    t_dec = 100;
+    uservo.setRawAngleMTurnByInterval(-10000, interval, t_acc, t_dec, 0);
+    delay(6000); // 暂停2s
+
+}
+```
+
+## 21.同步控制/同步数据监控
+
+</td></tr></table><table><tr><td bgcolor=#DDDDDD>
+
+**注意事项**：
+
+- **仅适用于无刷磁编码舵机V316及之后的版本**
+- Arduino UNO板子的RAM只有2k，目前只支持12个舵机同步
+
+</td></tr></table>
+
+
+
+### 21.1.  API
+
+**函数原型**
+
+```c++
+void FSUS_Servo::SyncCommand(uint8_t servocount, uint8_t syncmode, FSUS_sync_servo servoSync[]);	//同步控制
+    
+void FSUS_Servo::SyncMonitorCommand(uint8_t servocount, FSUS_sync_servo servoSync[],ServoMonitorData* data);	// 同步数据监控
+```
+
+**输入参数**
+
+- <无>
+
+**返回参数**
+
+舵机的数据
+
+
+
+### 21.2.示例源码
+
+`servo_sync_command.ino`
+
+```c++
+/* 
+ * 同步控制/同步监控
+ * 提示: 拓展板上电之后, 记得按下Arduino的RESET按键
+ * --------------------------
+ * 作者: 深圳市华馨京科技有限公司
+ * 网站：https://fashionrobo.com/
+ * 更新时间: 2024/12/30
+ */
+
+#include "FashionStar_UartServoProtocol.h"
+#include "FashionStar_UartServo.h" // Fashion Star总线伺服舵机的依赖
+
+// 串口总线舵机配置参数
+#define SERVO_ID 0 //舵机ID号
+#define BAUDRATE 115200 // 波特率
+
+// 调试串口的配置
+#if defined(ARDUINO_AVR_UNO)
+    #include <SoftwareSerial.h>
+    #define SOFT_SERIAL_RX 6 
+    #define SOFT_SERIAL_TX 7
+    SoftwareSerial softSerial(SOFT_SERIAL_RX, SOFT_SERIAL_TX); // 创建软串口
+    #define DEBUG_SERIAL softSerial
+    #define DEBUG_SERIAL_BAUDRATE 115200
+    
+#elif defined(ARDUINO_AVR_MEGA2560)
+    #define DEBUG_SERIAL Serial
+    #define DEBUG_SERIAL_BAUDRATE 115200
+    
+#elif defined(ARDUINO_ARCH_ESP32)
+    #define DEBUG_SERIAL Serial
+    #define DEBUG_SERIAL_BAUDRATE 115200
+    
+#elif defined(ARDUINO_ARCH_STM32)
+    #include <HardwareSerial.h>
+    //                      RX    TX
+    HardwareSerial Serial1(PA10, PA9);
+    //HardwareSerial Serial2(PA3, PA2); //这里串口2不需要定义
+    HardwareSerial Serial3(PB11, PB10);
+    #define DEBUG_SERIAL Serial1
+    #define DEBUG_SERIAL_BAUDRATE (uint32_t)115200
+    
+#endif 
+
+FSUS_Protocol protocol(BAUDRATE); //协议
+FSUS_Servo uservo(SERVO_ID, &protocol); // 创建舵机
+
+FSUS_sync_servo servoSyncArray[18]; // 
+
+void setup(){
+    protocol.init(); // 通信协议初始化
+    uservo.init(); //舵机角度初始化
+    // 打印例程信息
+    DEBUG_SERIAL.begin(DEBUG_SERIAL_BAUDRATE); // 初始化软串口的波特率
+}
+int mode;
+int count;
+ServoMonitorData servodata[1];
+void loop(){
+    mode = 1;
+    /*  mode 1:单圈角度控制
+        mode 2:单圈角度模式-指定时间
+        mode 3:单圈角度模式-指定速度
+        mode 4:多圈角度模式
+        mode 5:多圈角度模式-指定时间
+        mode 5:多圈角度模式-指定速度
+        注意：Arduino UNO板子的RAM只有2k，目前只支持12个舵机同步
+    */
+    count = 4;
+ for (int i = 0; i < count; i++) {
+    servoSyncArray[i].servoId = i;
+    servoSyncArray[i].angle = 90;
+    servoSyncArray[i].interval = 1000;
+    servoSyncArray[i].interval_multiturn = 1000;
+    servoSyncArray[i].velocity = 360;
+    servoSyncArray[i].t_acc = 100;
+    servoSyncArray[i].t_dec = 100;
+    servoSyncArray[i].power = 0;
+}
+    uservo.SyncCommand(count,mode, servoSyncArray);
+    delay(2000);
+
+    uservo.SyncMonitorCommand(count, servoSyncArray,servodata);
+    delay(2000);
+        for (int i = 0; i < count; i++) {
+        DEBUG_SERIAL.println("id:");  // 打印每个 syncmonitorData
+        DEBUG_SERIAL.println(servodata[i].servoId);
+
+        DEBUG_SERIAL.println("voltage:");  // 打印每个 syncmonitorData
+        DEBUG_SERIAL.println(servodata[i].voltage);
+
+        DEBUG_SERIAL.println("current:");  // 打印每个 syncmonitorData
+        DEBUG_SERIAL.println(servodata[i].current);
+
+        DEBUG_SERIAL.println("power:");  // 打印每个 syncmonitorData
+        DEBUG_SERIAL.println(servodata[i].power);
+
+        DEBUG_SERIAL.println("temperature:");  // 打印每个 syncmonitorData
+        DEBUG_SERIAL.println(servodata[i].temperature);
+
+        DEBUG_SERIAL.println("status:");  // 打印每个 syncmonitorData
+        DEBUG_SERIAL.println(servodata[i].status);
+
+        DEBUG_SERIAL.println("angle:");  // 打印每个 syncmonitorData
+        DEBUG_SERIAL.println(servodata[i].angle);
+
+        DEBUG_SERIAL.println("turns:");  // 打印每个 syncmonitorData
+        DEBUG_SERIAL.println(servodata[i].turns);
+        delay(1000);
+    }
+    delay(2000);
+
+    mode = 1;
+    count = 4;
+ for (int i = 0; i < count; i++) {
+    servoSyncArray[i].servoId = i;
+    servoSyncArray[i].angle = 0;
+    servoSyncArray[i].interval = 1000;
+    servoSyncArray[i].interval_multiturn = 1000;
+    servoSyncArray[i].velocity = 360;
+    servoSyncArray[i].t_acc = 100;
+    servoSyncArray[i].t_dec = 100;
+    servoSyncArray[i].power = 0;
+}
+    uservo.SyncCommand(count,mode, servoSyncArray);
+    delay(2000);
+    uservo.SyncMonitorCommand(count,servoSyncArray,servodata);
+    delay(2000);
+        for (int i = 0; i < count; i++) {
+        DEBUG_SERIAL.println("id:");  // 打印每个 syncmonitorData
+        DEBUG_SERIAL.println(servodata[i].servoId);
+
+        DEBUG_SERIAL.println("voltage:");  // 打印每个 syncmonitorData
+        DEBUG_SERIAL.println(servodata[i].voltage);
+
+        DEBUG_SERIAL.println("current:");  // 打印每个 syncmonitorData
+        DEBUG_SERIAL.println(servodata[i].current);
+
+        DEBUG_SERIAL.println("power:");  // 打印每个 syncmonitorData
+        DEBUG_SERIAL.println(servodata[i].power);
+
+        DEBUG_SERIAL.println("temperature:");  // 打印每个 syncmonitorData
+        DEBUG_SERIAL.println(servodata[i].temperature);
+
+        DEBUG_SERIAL.println("status:");  // 打印每个 syncmonitorData
+        DEBUG_SERIAL.println(servodata[i].status);
+
+        DEBUG_SERIAL.println("angle:");  // 打印每个 syncmonitorData
+        DEBUG_SERIAL.println(servodata[i].angle);
+
+        DEBUG_SERIAL.println("turns:");  // 打印每个 syncmonitorData
+        DEBUG_SERIAL.println(servodata[i].turns);
+        delay(1000);
+    }
+    delay(2000);
+
+}
+```
+
+日志输出
+
+
+
+```
+id:
+0
+voltage:
+11427.00
+current:
+30.00
+power:
+342.00
+temperature:
+2035.00
+status:
+0
+angle:
+0.10
+turns:
+0.00
+
+id:
+1
+voltage:
+11654.00
+current:
+30.00
+power:
+349.00
+temperature:
+2053.00
+status:
+0
+angle:
+0.10
+turns:
+0.00
+
+id:
+2
+voltage:
+11553.00
+current:
+30.00
+power:
+346.00
+temperature:
+2108.00
+status:
+0
+angle:
+0.10
+turns:
+0.00
+
+id:
+3
+voltage:
+11543.00
+current:
+30.00
+power:
+346.00
+temperature:
+2041.00
+status:
+0
+angle:
+0.10
+turns:
+0.00
+```
+
