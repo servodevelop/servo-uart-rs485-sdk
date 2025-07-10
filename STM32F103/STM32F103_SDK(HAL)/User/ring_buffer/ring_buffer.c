@@ -1,40 +1,32 @@
 #include "ring_buffer.h"
 
-// 队列重置
+// Queue Reset
 void RingBuffer_Reset(RingBufferTypeDef *ringBuf){
-	// 队首指针跟队尾指针都指向buffer的首个地址
+	// Both the head and tail pointers point to the first address of the buffer.
 	ringBuf->head = 0;
 	ringBuf->tail = 0;
 }
 
-// 创建队列
+// Creating a Queue
 void RingBuffer_Init(RingBufferTypeDef* ringBuf, uint16_t capacity, uint8_t *buffer){
-    // RingBufferTypeDef *ringBuf = (RingBufferTypeDef *)malloc(sizeof(RingBufferTypeDef));
-	// Buffer内存申请成功
+	// Buffer memory request successful
 	ringBuf->buffer = buffer;// (uint8_t *)malloc(ringBuf->size);
 	ringBuf->head = 0;
 	ringBuf->tail = 0;
-	// 尺寸size需要比容量capacity大一
+	// The size needs to be larger than the capacity.
 	ringBuf->size = capacity + 1;
-	// 数值初始化置为0
+
 	for (uint16_t i=0; i<ringBuf->size; i++){
 		ringBuf->buffer[i] = 0;
 	}
-	// printf("[RingBuffer_Init] ring buffer init pbuffer=%p\n", ringBuf->buffer);
 }
 
-// 销毁队列
-//void RingBuffer_Destory(RingBufferTypeDef *ringBuf){
-//	free(ringBuf->buffer);
-//	free(ringBuf);
-//}
-
-// 获得环形队列的容量
+// Getting the capacity of the ring queue
 uint16_t RingBuffer_GetCapacity(RingBufferTypeDef *ringBuf){
 	return ringBuf->size - 1;
 }
 
-// 获取环形队列已经存好的字节数
+// Get the number of bytes already stored in the ring queue
 uint16_t RingBuffer_GetByteUsed(RingBufferTypeDef *ringBuf) {
     if (ringBuf->head <= ringBuf->tail) {
         return ringBuf->tail - ringBuf->head;
@@ -43,32 +35,32 @@ uint16_t RingBuffer_GetByteUsed(RingBufferTypeDef *ringBuf) {
     }
 }
 
-// 获取队列的剩余容量
+// Get the remaining capacity of the queue
 uint16_t RingBuffer_GetByteFree(RingBufferTypeDef *ringBuf){
 	return RingBuffer_GetCapacity(ringBuf) - RingBuffer_GetByteUsed(ringBuf);
 }
 
-// 判断环形队列是否为空
+// Determine if the ring queue is empty
 uint8_t RingBuffer_IsEmpty(RingBufferTypeDef *ringBuf){
 	return RingBuffer_GetByteFree(ringBuf) == RingBuffer_GetCapacity(ringBuf);
 }
 
-// 判断环形队列是否已满
+// Determine if the ring queue is full
 uint8_t RingBuffer_IsFull(RingBufferTypeDef *ringBuf){
 	return RingBuffer_GetByteFree(ringBuf) == 0;
 }
 
-// 根据索引号读取第i个元素
+// Read the ith element according to the index number
 uint8_t RingBuffer_GetValueByIndex(RingBufferTypeDef *ringBuf, uint16_t index){
 	if (index >= RingBuffer_GetByteUsed(ringBuf)){
-		// 索引号超出了范围
+		// Index number out of range
 		return 0;
 	}
 	uint16_t rbIdx = (ringBuf->head + index + 1) % ringBuf->size;
 	return ringBuf->buffer[rbIdx];
 }
 
-// 弹出队首元素
+// Popup team header element
 uint8_t RingBuffer_Pop(RingBufferTypeDef *ringBuf){
 	uint8_t temp;
 	if(RingBuffer_IsEmpty(ringBuf)){
@@ -84,30 +76,28 @@ uint8_t RingBuffer_Pop(RingBufferTypeDef *ringBuf){
 }
 
 
-// 写入队尾元素
-// ring_buffer.c
+// Write to the last element of the queue
 void RingBuffer_Push(RingBufferTypeDef *ringBuf, uint8_t value) {
     if (RingBuffer_IsFull(ringBuf)) {
-        // 可选：增加溢出标志或日志输出
-        return; // 直接返回避免覆盖
+        return;
     }
     ringBuf->tail = (ringBuf->tail + 1) % ringBuf->size;
     ringBuf->buffer[ringBuf->tail] = value;
 }
 
-// 读取单个字节
+// Read a single byte
 uint8_t RingBuffer_ReadByte(RingBufferTypeDef *ringBuf){
 	return RingBuffer_Pop(ringBuf);
 }
 
-// 读取字节数组
+// Read byte array
 void RingBuffer_ReadByteArray(RingBufferTypeDef *ringBuf, uint8_t* dest, uint16_t size){
 	for(uint16_t idx=0; idx<size; idx++){
 		dest[idx] = RingBuffer_Pop(ringBuf);
 	}
 }
 
-// 读取有符号Short整数(两个字节)
+// Read signed Short integer (two bytes)
 int16_t RingBuffer_ReadShort(RingBufferTypeDef *ringBuf){
 	int16_t value;
 	uint8_t *p = (uint8_t *)&value;
@@ -115,7 +105,7 @@ int16_t RingBuffer_ReadShort(RingBufferTypeDef *ringBuf){
 	return value;
 }
 
-// 读取无符号Short整数(两个字节)
+// Read unsigned Short integer (two bytes)
 uint16_t RingBuffer_ReadUShort(RingBufferTypeDef *ringBuf){
 	uint16_t value;
 	uint8_t *p = (uint8_t *)&value;
@@ -123,7 +113,7 @@ uint16_t RingBuffer_ReadUShort(RingBufferTypeDef *ringBuf){
 	return value;
 }
 
-// 读取有符号Long类型的整数(四个字节)
+// Reads an integer of signed Long type (four bytes)
 int32_t RingBuffer_ReadLong(RingBufferTypeDef *ringBuf){
 	int32_t value;
 	uint8_t *p = (uint8_t *)&value;
@@ -131,7 +121,7 @@ int32_t RingBuffer_ReadLong(RingBufferTypeDef *ringBuf){
 	return value;
 }
 
-// 读取无符号Long类型的整数(四个字节)
+// Reads an integer of unsigned Long type (four bytes)
 uint32_t RingBuffer_ReadULong(RingBufferTypeDef *ringBuf){
 	uint32_t value;
 	uint8_t *p = (uint8_t *)&value;
@@ -139,7 +129,7 @@ uint32_t RingBuffer_ReadULong(RingBufferTypeDef *ringBuf){
 	return value;
 }
 
-// 读取浮点数(四个字节)
+// Read floating point numbers (four bytes)
 float RingBuffer_ReadFloat(RingBufferTypeDef *ringBuf){
 	float value;
 	uint8_t *p = (uint8_t *)&value;
@@ -147,49 +137,49 @@ float RingBuffer_ReadFloat(RingBufferTypeDef *ringBuf){
 	return value;
 }
 
-// 写入单个字节
+// Write single byte
 void RingBuffer_WriteByte(RingBufferTypeDef *ringBuf, uint8_t value){
 	RingBuffer_Push(ringBuf, value);
 }
 
-// 写入字节数组
+// Write to byte array
 void RingBuffer_WriteByteArray(RingBufferTypeDef *ringBuf, uint8_t* src, uint16_t size){
 	for(uint16_t idx=0; idx<size; idx++){
 		RingBuffer_Push(ringBuf, src[idx]);
 	}
 }
-// 写入有符号Short整数(两个字节)
+// Write signed Short integer (two bytes)
 void RingBuffer_WriteShort(RingBufferTypeDef *ringBuf, int16_t value){
 	uint8_t *p= (uint8_t *)&value;
 	RingBuffer_WriteByteArray(ringBuf, p, 2);
 }
 
-// 写入无符号Short整数(两个字节)
+// Write unsigned Short integer (two bytes)
 void RingBuffer_WriteUShort(RingBufferTypeDef *ringBuf, uint16_t value){
 	uint8_t *p= (uint8_t *)&value;
 	RingBuffer_WriteByteArray(ringBuf, p, 2);
 }
 
-// 写入有符号Long类型的整数(四个字节)
+// Write integer of signed Long type (four bytes)
 void RingBuffer_WriteLong(RingBufferTypeDef *ringBuf, int32_t value){
 	uint8_t *p= (uint8_t *)&value;
 	RingBuffer_WriteByteArray(ringBuf, p, 4);
 }
 
-// 写入无符号Long类型的整数(四个字节)
+// Write an integer of unsigned Long type (four bytes)
 void RingBuffer_WriteULong(RingBufferTypeDef *ringBuf, uint32_t value){
 	uint8_t *p= (uint8_t *)&value;
 	RingBuffer_WriteByteArray(ringBuf, p, 4);
 }
 
-// 写入浮点数(四个字节)
+// Write floating point number (four bytes)
 void RingBuffer_WriteFloat(RingBufferTypeDef *ringBuf, float value){
 	uint8_t *p= (uint8_t *)&value;
 	RingBuffer_WriteByteArray(ringBuf, p, 4);
 }
 
 
-// 计算校验和
+// Calculate the checksum
 uint8_t RingBuffer_GetChecksum(RingBufferTypeDef *ringBuf) {
     uint16_t nByte = RingBuffer_GetByteUsed(ringBuf);
     uint32_t bSum = 0;
@@ -200,7 +190,6 @@ uint8_t RingBuffer_GetChecksum(RingBufferTypeDef *ringBuf) {
     return (uint8_t)bSum;
 }
 
-// 
 uint8_t RingBuffer_PeekByte(RingBufferTypeDef *ringBuf, uint16_t index) {
     if (index >= RingBuffer_GetByteUsed(ringBuf)) return 0;
     uint16_t rbIdx = (ringBuf->head + index + 1) % ringBuf->size;
@@ -213,18 +202,18 @@ uint16_t RingBuffer_PeekUShort(RingBufferTypeDef *ringBuf, uint16_t index) {
     return (ringBuf->buffer[rbIdx] | (ringBuf->buffer[(rbIdx + 1) % ringBuf->size] << 8));
 }
 
-// 同步命令长度写入支持
+// Synchronized Command Length Write Support
 void RingBuffer_WriteUShortWithFlag(RingBufferTypeDef *ringBuf, uint16_t value) {
-    RingBuffer_WriteByte(ringBuf, 0xFF);       // 写入同步标志
-    RingBuffer_WriteUShort(ringBuf, value);    // 写入16位长度
+    RingBuffer_WriteByte(ringBuf, 0xFF);       // Write Sync Flag
+    RingBuffer_WriteUShort(ringBuf, value);    // Write 16-bit length
 }
-// 增强读取逻辑以解析同步长度
+// Enhanced read logic to resolve synchronization lengths
 uint16_t RingBuffer_ReadUShortWithFlag(RingBufferTypeDef *ringBuf, uint8_t *isSync) {
     uint8_t flag = RingBuffer_ReadByte(ringBuf);
     *isSync = (flag == 0xFF) ? 1 : 0;
     if (*isSync) {
-        return RingBuffer_ReadUShort(ringBuf); // 读取16位长度
+        return RingBuffer_ReadUShort(ringBuf); // Read 16-bit length
     } else {
-        return (uint16_t)flag;                // 直接返回8位长度
+        return (uint16_t)flag;                // Returns the 8-bit length directly
     }
 }

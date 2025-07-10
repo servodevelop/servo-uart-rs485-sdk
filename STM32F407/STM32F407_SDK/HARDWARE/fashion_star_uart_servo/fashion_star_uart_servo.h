@@ -1,5 +1,5 @@
 /*
- * Fashion Star 总线伺服舵机驱动库
+ * Fashion Star Bus Servo Driver Library
  * Version: v0.0.2
  * UpdateTime: 2024/07/17
  */
@@ -11,299 +11,300 @@
 #include "usart.h"
 #include "ring_buffer.h"
 #include "sys_tick.h"
+
 #define COUNTDOWN_MS 100
 
-// FSUS通信协议
-// 注: FSUS是Fashion Star Uart Servo的缩写
+// FSUS communication protocol
+// Note: FSUS is the abbreviation for Fashion Star Uart Servo
 
-// 串口通讯超时设置
+// Serial communication timeout setting
 #define FSUS_TIMEOUT_MS 100
-// 舵机用户自定义数据块的大小 单位Byte
+// The size of the servo user-defined data block in bytes
 #define FSUS_SERVO_BATCH_DATA_SIZE 32
-// 返回的响应数据包最长的长度
+// The maximum length of the returned response data packet
 #define FSUS_PACK_RESPONSE_MAX_SIZE 350
-// 在总线伺服舵机的通信系统设计里, 使用的字节序为Little Endian(低字节序/小端格式)
-// STM32系统的数值存储模式就是Little Endian
-// 所以0x4c12 这个数值, 在实际发送的时候低位会在前面 0x12, 0x4c
+// In the communication system design of bus servo servos, Little Endian (low byte order / little-endian format) is used for byte order
+// The STM32 system's numerical storage mode is Little Endian
+// So for the value 0x4c12, when actually sending, the low byte comes first 0x12, 0x4c
 #define FSUS_PACK_REQUEST_HEADER 0x4c12
 #define FSUS_PACK_RESPONSE_HEADER 0x1c05
 
-// FSUS控制指令数据
-// 注: 一下所有的指令都是针对单个舵机的
+// FSUS control command data
+// Note: All the following commands are for a single servo
 #define FSUS_CMD_NUM 30
-#define FSUS_CMD_PING 1                               // 舵机通讯检测
-#define FSUS_CMD_RESET_USER_DATA 2                    // 重置用户数据
-#define FSUS_CMD_READ_DATA 3                          // 单个舵机 读取数据库
-#define FSUS_CMD_WRITE_DATA 4                         // 单个舵机 写入数据块
-#define FSUS_CMD_READ_BATCH_DATA 5                    // 单个舵机 批次读取(读取一个舵机所有的数据)
-#define FSUS_CMD_WRITE_BATCH_DATA 6                   // 单个舵机 批次写入(写入一个舵机所有的数据)
-#define FSUS_CMD_SPIN 7                               // 单个舵机 设置轮式模式
-#define FSUS_CMD_ROTATE 8                             // 角度控制模式(设置舵机的角度))
-#define FSUS_CMD_DAMPING 9                            // 阻尼模式
-#define FSUS_CMD_READ_ANGLE 10                        // 舵机角度读取
-#define FSUS_CMD_SET_SERVO_ANGLE_BY_INTERVAL 11       // 角度设置(指定周期)
-#define FSUS_CMD_SET_SERVO_ANGLE_BY_VELOCITY 12       // 角度设置(指定转速)
-#define FSUS_CMD_SET_SERVO_ANGLE_MTURN 13             // 多圈角度设置
-#define FSUS_CMD_SET_SERVO_ANGLE_MTURN_BY_INTERVAL 14 // 多圈角度设置(指定周期)
-#define FSUS_CMD_SET_SERVO_ANGLE_MTURN_BY_VELOCITY 15 // 多圈角度设置(指定转速)
-#define FSUS_CMD_QUERY_SERVO_ANGLE_MTURN 16           // 查询舵机角度(多圈)
-#define FSUS_CMD_RESERT_SERVO_ANGLE_MTURN 17          // 重置舵机多圈角度
-#define FSUS_CMD_BEGIN_ASYNC 18                       // 开始异步命令
-#define FSUS_CMD_END_ASYNC 19                      		// 结束异步命令
-#define FSUS_CMD_SET_SERVO_ReadData 22                // 舵机数据监控
-#define FSUS_CMD_SET_ORIGIN_POINT 23                  // 设置零点
-#define FSUS_CMD_CONTROL_MODE_STOP 24                 // 控制模式停止指令
-#define FSUS_CMD_SET_SERVO_SyncCommand 25             // 同步命令
+#define FSUS_CMD_PING 1                               // Servo communication detection
+#define FSUS_CMD_RESET_USER_DATA 2                    // Reset user data
+#define FSUS_CMD_READ_DATA 3                          // Read database for a single servo
+#define FSUS_CMD_WRITE_DATA 4                         // Write data block for a single servo
+#define FSUS_CMD_READ_BATCH_DATA 5                    // Batch read for a single servo (read all data of a single servo)
+#define FSUS_CMD_WRITE_BATCH_DATA 6                   // Batch write for a single servo (write all data of a single servo)
+#define FSUS_CMD_SPIN 7                               // Set wheel mode for a single servo
+#define FSUS_CMD_ROTATE 8                             // Angle control mode (set servo angle))
+#define FSUS_CMD_DAMPING 9                            // Damping mode
+#define FSUS_CMD_READ_ANGLE 10                        // Read servo angle
+#define FSUS_CMD_SET_SERVO_ANGLE_BY_INTERVAL 11       // Angle setting (specify cycle)
+#define FSUS_CMD_SET_SERVO_ANGLE_BY_VELOCITY 12       // Angle setting (specify speed)
+#define FSUS_CMD_SET_SERVO_ANGLE_MTURN 13             // Multi-turn angle setting
+#define FSUS_CMD_SET_SERVO_ANGLE_MTURN_BY_INTERVAL 14 // Multi-turn angle setting (specify cycle)
+#define FSUS_CMD_SET_SERVO_ANGLE_MTURN_BY_VELOCITY 15 // Multi-turn angle setting (specify speed)
+#define FSUS_CMD_QUERY_SERVO_ANGLE_MTURN 16           // Query servo angle (multi-turn)
+#define FSUS_CMD_RESERT_SERVO_ANGLE_MTURN 17          // Reset servo multi-turn angle
+#define FSUS_CMD_BEGIN_ASYNC 18                       // Start asynchronous command
+#define FSUS_CMD_END_ASYNC 19                      		// End asynchronous command
+#define FSUS_CMD_SET_SERVO_ReadData 22                // Servo data monitoring
+#define FSUS_CMD_SET_ORIGIN_POINT 23                  // Set zero point
+#define FSUS_CMD_CONTROL_MODE_STOP 24                 // Control mode stop command
+#define FSUS_CMD_SET_SERVO_SyncCommand 25             // Synchronous command
 
-// FSUS状态码
+// FSUS status codes
 #define FSUS_STATUS uint8_t
-#define FSUS_STATUS_SUCCESS 0               // 设置/读取成功
-#define FSUS_STATUS_FAIL 1                  // 设置/读取失败
-#define FSUS_STATUS_TIMEOUT 2               // 等待超时
-#define FSUS_STATUS_WRONG_RESPONSE_HEADER 3 // 响应头不对
-#define FSUS_STATUS_UNKOWN_CMD_ID 4         // 未知的控制指令
-#define FSUS_STATUS_SIZE_TOO_BIG 5          // 参数的size大于FSUS_PACK_RESPONSE_MAX_SIZE里面的限制
-#define FSUS_STATUS_CHECKSUM_ERROR 6        // 校验和错误
-#define FSUS_STATUS_ID_NOT_MATCH 7          // 请求的舵机ID跟反馈回来的舵机ID不匹配
-#define FSUS_STATUS_ERRO 8                  // 设置同步模式错误
+#define FSUS_STATUS_SUCCESS 0               // Set/read success
+#define FSUS_STATUS_FAIL 1                  // Set/read failure
+#define FSUS_STATUS_TIMEOUT 2               // Wait timeout
+#define FSUS_STATUS_WRONG_RESPONSE_HEADER 3 // Wrong response header
+#define FSUS_STATUS_UNKOWN_CMD_ID 4         // Unknown control command
+#define FSUS_STATUS_SIZE_TOO_BIG 5          // Parameter size exceeds the limit in FSUS_PACK_RESPONSE_MAX_SIZE
+#define FSUS_STATUS_CHECKSUM_ERROR 6        // Checksum error
+#define FSUS_STATUS_ID_NOT_MATCH 7          // Requested servo ID does not match the feedback servo ID
+#define FSUS_STATUS_ERRO 8                  // Synchronous mode setting error
 
-// 静止状态判断条件
-#define FSUS_ANGLE_DEADAREA 2.0f  // 电机角度死区
-#define FSUS_WAIT_COUNT_MAX 10000 // 等待重复查询角度的最大次数
+// Static state judgment conditions
+#define FSUS_ANGLE_DEADAREA 2.0f  // Motor angle dead zone
+#define FSUS_WAIT_COUNT_MAX 10000 // Maximum number of times to wait for repeated angle queries
 
-/* 舵机只读数据ID及使用说明 (只读)*/
-#define FSUS_PARAM_VOLTAGE 1    // 电压 (单位mV)
-#define FSUS_PARAM_CURRENT 2    // 电流 (单位mA)
-#define FSUS_PARAM_POWER 3      // 功率 (单位mw)
-#define FSUS_PARAM_TEMPRATURE 4 // 温度 (单位ADC)
+/* Read-only data ID and usage instructions for servos (read-only)*/
+#define FSUS_PARAM_VOLTAGE 1    // Voltage (unit mV)
+#define FSUS_PARAM_CURRENT 2    // Current (unit mA)
+#define FSUS_PARAM_POWER 3      // Power (unit mw)
+#define FSUS_PARAM_TEMPRATURE 4 // Temperature (unit ADC)
 
 /*
-舵机工作状态
-BIT[0] - 执行指令置1，执行完成后清零。
-BIT[1] - 执行指令错误置1，在下次正确执行后清零。
-BIT[2] - 堵转错误置1，解除堵转后清零。
-BIT[3] - 电压过高置1，电压恢复正常后清零。
-BIT[4] - 电压过低置1，电压恢复正常后清零。
-BIT[5] - 电流错误置1，电流恢复正常后清零。
-BIT[6] - 功率错误置1，功率恢复正常后清零。
-BIT[7] - 温度错误置1，温度恢复正常后清零。
+Servo working status
+BIT[0] - Set to 1 when executing a command, cleared after completion.
+BIT[1] - Set to 1 when command execution error, cleared after correct execution.
+BIT[2] - Set to 1 when stall error, cleared after stall is resolved.
+BIT[3] - Set to 1 when voltage is too high, cleared after voltage returns to normal.
+BIT[4] - Set to 1 when voltage is too low, cleared after voltage returns to normal.
+BIT[5] - Set to 1 when current error, cleared after current returns to normal.
+BIT[6] - Set to 1 when power error, cleared after power returns to normal.
+BIT[7] - Set to 1 when temperature error, cleared after temperature returns to normal.
 */
-#define FSUS_PARAM_SERVO_STATUS 5 // 舵机工作状态 (字节长度 1)
+#define FSUS_PARAM_SERVO_STATUS 5 // Servo working status (byte length 1)
 
-/* 舵机用户自定义参数的数据ID及使用说明 (可度也可写)*/
+/* Data ID and usage instructions for user-defined parameters of servos (readable and writable)*/
 
-/* 此项设置同时具备两个功能
- * 在轮式模式与角度控制模式下
- * 1. 舵机指令是否可以中断 interruptable?
- * 2. 是否产生反馈数据?
- * 0x00(默认)
- *      舵机控制指令执行可以被中断, 新的指令覆盖旧的指令
- *      无反馈数据
+/* This item has two functions at the same time
+ * In wheel mode and angle control mode
+ * 1. Whether the servo command can be interrupted interruptable?
+ * 2. Whether feedback data is generated?
+ * 0x00(default)
+ *      Servo control commands can be interrupted, new commands overwrite old commands
+ *      No feedback data
  * 0x01
- *      舵机控制指令不可以被中断, 新的指令添加到等候队列里面
- *      等候队列的长度是1, 需要自己在程序里面维护一个队列
- *      当新的控制指令超出了缓冲区的大小之后, 新添加的指令被忽略
- *      指令执行结束之后发送反馈数据
+ *      Servo control commands cannot be interrupted, new commands are added to the waiting queue
+ *      The waiting queue length is 1, you need to maintain a queue in your program yourself
+ *      When the new control command exceeds the buffer size, the newly added command is ignored
+ *      After the command execution is completed, feedback data is sent
  */
 #define FSUS_PARAM_RESPONSE_SWITCH 33
 /*
- * 舵机的ID号, (字节长度 1)
- * 取值范围是 0-254
- * 255号为广播地址，不能赋值给舵机 广播地址在PING指令中使用。
+ * Servo ID number, (byte length 1)
+ * Range of values is 0-254
+ * 255 is the broadcast address, which cannot be assigned to the servo. The broadcast address is used in the PING command.
  */
 #define FSUS_PARAM_SERVO_ID 34
 /*
- * 串口通讯的波特率ID  (字节长度 1)
- * 取值范围 [0x01,0x07] , 默认值0x05
+ * Serial communication baud rate ID  (byte length 1)
+ * Range of values [0x01,0x07] , default value0x05
  * 0x01-9600,
  * 0x02-19200,
  * 0x03-38400,
  * 0x04-57600,
- * 0x05-115200 (默认波特率),
+ * 0x05-115200 (default baud rate),
  * 0x06-250000,
  * 0x07-500000,
- * 波特率设置时即生效
+ * The baud rate takes effect immediately upon setting
  */
 #define FSUS_PARAM_BAUDRATE 36
 
-/* 舵机保护值相关设置, 超过阈值舵机就进入保护模式 */
+/* Servo protection value related settings, the servo enters protection mode when exceeding the threshold */
 /*
- * 舵机堵转保护模式  (字节长度 1)
- * 0x00-模式1 降功率到堵轉功率上限
- * 0x01-模式2 释放舵机锁力
+ * Servo stall protection mode  (byte length 1)
+ * 0x00-Mode 1 Reduce power to stall power upper limit
+ * 0x01-Mode 2 Release servo lock force
  */
 #define FSUS_PARAM_STALL_PROTECT 37
-/* 舵机堵转功率上限, (单位mW) (字节长度 2) */
+/* Servo stall power upper limit, (unit mW) (byte length 2) */
 #define FSUS_PARAM_STALL_POWER_LIMIT 38
-/* 舵机电压下限 (单位mV) (字节长度 2) */
+/* Servo voltage lower limit (unit mV) (byte length 2) */
 #define FSUS_PARAM_OVER_VOLT_LOW 39
-/* 舵机电压上限 (单位mV) (字节长度 2) */
+/* Servo voltage upper limit (unit mV) (byte length 2) */
 #define FSUS_PARAM_OVER_VOLT_HIGH 40
-/* 舵机温度上限 (单位 摄氏度) (字节长度 2) */
+/* Servo temperature upper limit (unit Celsius) (byte length 2) */
 #define FSUS_PARAM_OVER_TEMPERATURE 41
-/* 舵机功率上限 (单位mW) (字节长度 2) */
+/* Servo power upper limit (unit mW) (byte length 2) */
 #define FSUS_PARAM_OVER_POWER 42
-/* 舵机电流上限 (单位mA) (字节长度 2) */
+/* Servo current upper limit (unit mA) (byte length 2) */
 #define FSUS_PARAM_OVER_CURRENT 43
 /*
- * 舵机启动加速度处理开关 (字节长度 1)
- * 0x00 不启动加速度处理 (无效设置)
- * 0x01 启用加速度处理(默认值)
- *      舵机梯形速度控制,根据时间t推算加速度a
- *      行程前1/4 加速
- *      行程中间1/2保持匀速
- *      行程后1/4
+ * Servo startup acceleration processing switch (byte length 1)
+ * 0x00 Do not start acceleration processing (invalid setting)
+ * 0x01 Enable acceleration processing(default value)
+ *      Trapezoidal speed control of the servo, calculate acceleration a according to time t
+ *      Accelerate in the first 1/4 of the stroke
+ *      Maintain constant speed in the middle 1/2 of the stroke
+ *      In the last 1/4 of the stroke
  */
 #define FSUS_PARAM_ACCEL_SWITCH 44
 /*
- * 舵机上电锁力开关 (字节长度 1)
- * 0x00 上电舵机释放锁力(默认值)
- * 0x11 上电时刹车
+ * Servo power-on lock force switch (byte length 1)
+ * 0x00 Power-on servo releases lock force(default value)
+ * 0x11 Power-on brake
  */
 #define FSUS_PARAM_POWER_ON_LOCK_SWITCH 46
 /*
- * [轮式模式] 轮式模式刹车开关 (字节长度 1)
- * 0x00 停止时舵机释放锁力(默认)
- * 0x01 停止时刹车
+ * [Wheel mode] Wheel mode brake switch (byte length 1)
+ * 0x00 When stopped, the servo releases lock force(default)
+ * 0x01 When stopped, brake
  */
 #define FSUS_PARAM_WHEEL_MODE_BRAKE_SWITCH 47
 /*
- * [角度模式] 角度限制开关 (字节长度 1)
- * 0x00 关闭角度限制
- * 0x01 开启角度限制
- * 注: 只有角度限制模式开启之后, 角度上限下限才有效
+ * [Angle mode] Angle limit switch (byte length 1)
+ * 0x00 Disable angle limit
+ * 0x01 Enable angle limit
+ * Note: Only when the angle limit mode is enabled, the angle upper and lower limits are valid
  */
 #define FSUS_PARAM_ANGLE_LIMIT_SWITCH 48
 /*
- * [角度模式] 舵机上电首次角度设置缓慢执行 (字节长度 1)
- * 0x00 关闭
- * 0x01 开启
- * 开启后更安全
- * 缓慢旋转的时间周期即为下方的”舵机上电启动时间“
+ * [Angle mode] Slow execution of initial angle setting when servo is powered on (byte length 1)
+ * 0x00 Disable
+ * 0x01 Enable
+ * Enabling is safer
+ * The time period for slow rotation is the "servo power-on startup time" below
  */
 #define FSUS_PARAM_SOFT_START_SWITCH 49
 /*
- * [角度模式] 舵机上电启动时间 (单位ms)(字节长度 2)
- * 默认值: 0x0bb8
+ * [Angle mode] Servo power-on startup time (unit ms)(byte length 2)
+ * Default value: 0x0bb8
  */
 #define FSUS_PARAM_SOFT_START_TIME 50
 /*
- * [角度模式] 舵机角度上限 (单位0.1度)(字节长度 2)
+ * [Angle mode] Servo angle upper limit (unit 0.1 degree)(byte length 2)
  */
 #define FSUS_PARAM_ANGLE_LIMIT_HIGH 51
 /*
- * [角度模式] 舵机角度下限 (单位0.1度)(字节长度 2)
+ * [Angle mode] Servo angle lower limit (unit 0.1 degree)(byte length 2)
  */
 #define FSUS_PARAM_ANGLE_LIMIT_LOW 52
 /*
- * [角度模式] 舵机中位角度偏移 (单位0.1度)(字节长度 2)
+ * [Angle mode] Servo mid-position angle offset (unit 0.1 degree)(byte length 2)
  */
 #define FSUS_PARAM_ANGLE_MID_OFFSET 53
 
-// 帧头接收完成的标志位
+// Header received completion flag
 #define FSUS_RECV_FLAG_HEADER 0x01
-// 控制指令接收完成的标志位
+// Command ID received completion flag
 #define FSUS_RECV_FLAG_CMD_ID 0x02
-// 内容长度接收完成的标志位
+// Content length received completion flag
 #define FSUS_RECV_FLAG_SIZE 0x04
-// 内容接收完成的标志位
+// Content received completion flag
 #define FSUS_RECV_FLAG_CONTENT 0x08
-// 校验和接收的标志位
+// Checksum received flag
 #define FSUS_RECV_FLAG_CHECKSUM 0x10
 
-// 总线伺服舵机用户自定义设置
-// 是否开启响应模式
+// Bus servo servo user-defined settings
+// Whether to enable response mode
 #define FSUS_IS_RESPONSE_ON 0
 
-// 数据帧结构体（统一结构）
+// Data frame structure (unified structure)
 typedef struct {
     uint16_t header;
     uint8_t cmdId;
-    uint16_t size;  // 统一使用16位长度
+    uint16_t size;  // Unified use of 16-bit length
     uint8_t content[FSUS_PACK_RESPONSE_MAX_SIZE];
     uint8_t checksum;
     uint8_t status;
-    uint8_t isSync;  // 新增同步标志
+    uint8_t isSync;  // New synchronization flag
 } PackageTypeDef;
 
-// 函数声明
+// Function declarations
 void FSUS_Package2RingBuffer(PackageTypeDef *pkg, RingBufferTypeDef *ringBuf);
-// 计算校验和
+// Calculate checksum
 uint8_t FSUS_CalcChecksum(PackageTypeDef *pkg);
-// 判断是否为有效的请求头的
+// Determine if it is a valid request header
 FSUS_STATUS FSUS_IsValidResponsePackage(PackageTypeDef *pkg);
-// 字节数组转换为数据帧
+// Byte array to data frame
 FSUS_STATUS FSUS_RingBuffer2Package(RingBufferTypeDef *ringBuf, PackageTypeDef *pkg);
-// 构造发送数据帧
+// Construct send data frame
 void FSUS_SendPackage_Common(Usart_DataTypeDef *usart, uint8_t cmdId, uint16_t size, uint8_t *content, uint8_t isSync);
-// 接收数据帧 (在接收的时候动态的申请内存)
+// Receive data frame (dynamically allocate memory during reception)
 FSUS_STATUS FSUS_RecvPackage(Usart_DataTypeDef *usart, PackageTypeDef *pkg);
 FSUS_STATUS FSUS_sync_RecvPackage(Usart_DataTypeDef *usart, PackageTypeDef *pkg);
 
-// 舵机通讯检测
-// 注: 如果没有舵机响应这个Ping指令的话, 就会超时
+// Servo communication detection
+// Note: If no servo responds to this Ping command, it will time out
 FSUS_STATUS FSUS_Ping(Usart_DataTypeDef *usart, uint8_t servo_id);
 
-// 重置舵机的用户资料
+// Reset the user data of the servo
 FSUS_STATUS FSUS_ResetUserData(Usart_DataTypeDef *usart, uint8_t servo_id);
 
-// 读取数据
+// Read data
 FSUS_STATUS FSUS_ReadData(Usart_DataTypeDef *usart, uint8_t servo_id, uint8_t address, uint8_t *value, uint8_t *size);
 
-// 写入数据
+// Write data
 FSUS_STATUS FSUS_WriteData(Usart_DataTypeDef *usart, uint8_t servo_id, uint8_t address, uint8_t *value, uint8_t size);
 
-// 设置舵机的角度
-// @angle 单位度
-// @interval 单位ms
-// @power 舵机执行功率 单位mW
-//        若power=0或者大于保护值
+// Set the angle of the servo
+// @angle Unit degree
+// @interval Unit ms
+// @power Servo execution power Unit mW
+//        If power=0 or greater than the protection value
 FSUS_STATUS FSUS_SetServoAngle(Usart_DataTypeDef *usart, uint8_t servo_id, float angle, uint16_t interval, uint16_t power);
 
-/* 设置舵机的角度(指定周期) */
+/* Set the angle of the servo (specify cycle) */
 FSUS_STATUS FSUS_SetServoAngleByInterval(Usart_DataTypeDef *usart, uint8_t servo_id,
                                          float angle, uint16_t interval, uint16_t t_acc,
                                          uint16_t t_dec, uint16_t power);
 
-/* 设置舵机的角度(指定转速) */
+/* Set the angle of the servo (specify speed) */
 FSUS_STATUS FSUS_SetServoAngleByVelocity(Usart_DataTypeDef *usart, uint8_t servo_id,
                                          float angle, float velocity, uint16_t t_acc,
                                          uint16_t t_dec, uint16_t power);
 
-/* 查询单个舵机的角度信息 angle 单位度 */
+/* Query the angle information of a single servo angle Unit degree */
 FSUS_STATUS FSUS_QueryServoAngle(Usart_DataTypeDef *usart, uint8_t servo_id, float *angle);
 
-/* 设置舵机的角度(多圈模式) */
+/* Set the angle of the servo (multi-turn mode) */
 FSUS_STATUS FSUS_SetServoAngleMTurn(Usart_DataTypeDef *usart, uint8_t servo_id, float angle,
                                     uint32_t interval, uint16_t power);
 
-/* 设置舵机的角度(多圈模式, 指定周期) */
+/* Set the angle of the servo (multi-turn mode, specify cycle) */
 FSUS_STATUS FSUS_SetServoAngleMTurnByInterval(Usart_DataTypeDef *usart, uint8_t servo_id, float angle,
                                               uint32_t interval, uint16_t t_acc, uint16_t t_dec, uint16_t power);
 
-/* 设置舵机的角度(多圈模式, 指定转速) */
+/* Set the angle of the servo (multi-turn mode, specify speed) */
 FSUS_STATUS FSUS_SetServoAngleMTurnByVelocity(Usart_DataTypeDef *usart, uint8_t servo_id, float angle,
                                               float velocity, uint16_t t_acc, uint16_t t_dec, uint16_t power);
 
-/* 查询舵机的角度(多圈模式) */
+/* Query the angle of the servo (multi-turn mode) */
 FSUS_STATUS FSUS_QueryServoAngleMTurn(Usart_DataTypeDef *usart, uint8_t servo_id, float *angle);
 
-/* 舵机阻尼模式 */
+/* Servo damping mode */
 FSUS_STATUS FSUS_DampingMode(Usart_DataTypeDef *usart, uint8_t servo_id, uint16_t power);
 
-/*重置多圈舵机角度*/
+/* Reset multi-turn servo angle*/
 FSUS_STATUS FSUS_ServoAngleReset(Usart_DataTypeDef *usart, uint8_t servo_id);
 
-/*零点设置 仅适用于无刷磁编码舵机*/
+/* Zero point setting Only applicable to brushless magnetic encoder servos*/
 FSUS_STATUS FSUS_SetOriginPoint(Usart_DataTypeDef *usart, uint8_t servo_id);
 
-/* 舵机开始异步命令*/
+/* Servo start asynchronous command*/
 FSUS_STATUS FSUS_BeginAsync(Usart_DataTypeDef *usart);
 
-/* 舵机结束异步命令*/
+/* Servo end asynchronous command*/
 FSUS_STATUS FSUS_EndAsync(Usart_DataTypeDef *usart,uint8_t mode);
 
-// 舵机的数据结构体
+// Servo data structure
 typedef struct {
     uint8_t id;
     int16_t voltage;
@@ -314,19 +315,19 @@ typedef struct {
     float angle;
     int16_t circle_count;
 } ServoData;
-/* 舵机单个数据监控*/
+/* Single servo data monitoring*/
 FSUS_STATUS FSUS_ServoMonitor(Usart_DataTypeDef *usart, uint8_t servo_id, ServoData servodata[]);
-/* 舵机控制模式停止指令*/
+/* Servo control mode stop command*/
 FSUS_STATUS FSUS_StopOnControlMode(Usart_DataTypeDef *usart, uint8_t servo_id, uint8_t mode, uint16_t power);
 
-/*同步命令的模式选择
-* 1：设置舵机的角度
-* 2：设置舵机的角度(指定周期)
-* 3：设置舵机的角度(指定转速)
-* 4：设置舵机的角度(多圈模式)
-* 5：设置舵机的角度(多圈模式, 指定周期) 
-* 6：设置舵机的角度(多圈模式, 指定转速)
-* 7：读取舵机的数据*/
+/* Synchronous command mode selection
+* 1: Set the angle of the servo
+* 2: Set the angle of the servo (specify cycle)
+* 3: Set the angle of the servo (specify speed)
+* 4: Set the angle of the servo (multi-turn mode)
+* 5: Set the angle of the servo (multi-turn mode, specify cycle) 
+* 6: Set the angle of the servo (multi-turn mode, specify speed)
+* 7: Read servo data*/
 typedef enum {
     MODE_SET_SERVO_ANGLE = 1,
     MODE_SET_SERVO_ANGLE_BY_INTERVAL = 2,
@@ -337,7 +338,7 @@ typedef enum {
 		MODE_Query_SERVO_Monitor = 7
 } ServoMode;
 
-/*同步命令的舵机设置参数结构体*/
+/* Synchronous command servo setting parameter structure*/
 typedef struct
 {
 	uint8_t id;
@@ -350,12 +351,12 @@ typedef struct
 	uint16_t power;
 }FSUS_sync_servo;
 
-extern FSUS_sync_servo SyncArray[20]; // 假设您要控制20个伺服同步
-extern ServoData servodata[20];//假设您要读取20个伺服舵机的数据
+extern FSUS_sync_servo SyncArray[20]; // Assume you want to control 20 servos synchronously
+extern ServoData servodata[20];//Assume you want to read data from 20 servo servos
 
-/* 同步命令舵机数据解析函数*/
+/* Synchronous command servo data parsing function*/
 FSUS_STATUS FSUS_SyncServoMonitor(Usart_DataTypeDef *usart, uint8_t servo_count, ServoData servodata[]);
-/* 同步命令选择模式控制函数*/
+/* Synchronous command mode selection control function*/
 FSUS_STATUS FSUS_SyncCommand(Usart_DataTypeDef *usart, uint8_t servo_count, uint8_t ServoMode, FSUS_sync_servo servoSync[]);
 
 #endif
