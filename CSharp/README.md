@@ -11,7 +11,7 @@
 
 上位机软件可以调试总线伺服舵机，测试总线伺服舵机的功能。
 
-- 上位机软件：[FashionStar UART总线伺服舵机上位机软件](https://fashionrobo.com/wp-content/uploads/download/Develop-US_1.0.4.171.zip)
+- 上位机软件：[FashionStar UART总线伺服舵机上位机软件](https://fashionrobo.com/downloadcenter/)
 
 - 使用说明：[总线伺服舵机上位机软件使用说明](https://wiki.fashionrobo.com/uartbasic/uart-servo-software/)
 
@@ -62,7 +62,7 @@ HP8-U45-M总线伺服舵机
 
 总线伺服舵机转接板UC-01
 
-![image-20240807101252625](./images/image-20240807101252625.png)
+![image-20240807101252625](./images/1.4.png)
 
 ## 2.接线说明
 
