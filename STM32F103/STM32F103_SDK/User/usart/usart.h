@@ -15,46 +15,46 @@
 #define USART3_ENABLE 0
 
 
-// 串口1相关参数
+// UART1 related parameters
 #if USART1_ENABLE
-    // 波特率
+    // Baud rate
     #define USART1_BAUDRATE 115200
-    // 时钟定义
+    // Clock definition
     #define USART1_CLK RCC_APB2Periph_USART1
     #define USART1_APBxClkCmd RCC_APB2PeriphClockCmd
     #define USART1_GPIO_CLK RCC_APB2Periph_GPIOA
     #define USART1_GPIO_APBxClkCmd RCC_APB2PeriphClockCmd
-    // GPIO引脚定义
+    // GPIO pin definition
     #define USART1_TX_GPIO_PORT GPIOA
     #define USART1_TX_GPIO_PIN GPIO_Pin_9
     #define USART1_RX_GPIO_PORT GPIOA
     #define USART1_RX_GPIO_PIN  GPIO_Pin_10
 #endif
 
-// 串口2相关参数
+// UART2 related parameters
 #if USART2_ENABLE
     #define USART2_BAUDRATE 115200
-    // 时钟定义
+    // Clock definition
     #define USART2_CLK RCC_APB1Periph_USART2
     #define USART2_APBxClkCmd RCC_APB1PeriphClockCmd
     #define USART2_GPIO_CLK RCC_APB2Periph_GPIOA
     #define USART2_GPIO_APBxClkCmd RCC_APB2PeriphClockCmd
-    // GPIO引脚定义
+    // GPIO pin definition
     #define USART2_TX_GPIO_PORT GPIOA
     #define USART2_TX_GPIO_PIN GPIO_Pin_2
     #define USART2_RX_GPIO_PORT GPIOA
     #define USART2_RX_GPIO_PIN  GPIO_Pin_3
 #endif
 
-// 串口3相关参数
+// UART3 related parameters
 #if USART3_ENABLE
     #define USART3_BAUDRATE 115200
-    // 时钟定义
+    // Clock definition
     #define USART3_CLK RCC_APB1Periph_USART3
     #define USART3_APBxClkCmd RCC_APB1PeriphClockCmd
     #define USART3_GPIO_CLK RCC_APB2Periph_GPIOB
     #define USART3_GPIO_APBxClkCmd RCC_APB2PeriphClockCmd
-    // GPIO引脚定义
+    // GPIO pin definition
     #define USART3_TX_GPIO_PORT GPIOB
     #define USART3_TX_GPIO_PIN GPIO_Pin_10
     #define USART3_RX_GPIO_PORT GPIOB
@@ -64,13 +64,13 @@
 typedef struct
 {  
     USART_TypeDef *pUSARTx;
-    // 发送端缓冲区
+    // Transmit buffer
     RingBufferTypeDef *sendBuf;
-	// 接收端缓冲区
+	// Receive buffer
     RingBufferTypeDef *recvBuf;
 } Usart_DataTypeDef;
 
-//memset(&gc_block, 0, sizeof(parser_block_t))
+// Set all members of gc_block to 0, size is sizeof(parser_block_t)
 #if USART1_ENABLE
     extern Usart_DataTypeDef usart1;
     extern uint8_t usart1SendBuf[USART_SEND_BUF_SIZE+1];
@@ -96,14 +96,14 @@ typedef struct
 	extern Usart_DataTypeDef usart3;
 #endif
 
-// 配置串口
+// Initialize UART
 void Usart_Init(void);
-// 发送字节
+// Send a byte
 void Usart_SendByte(USART_TypeDef *pUSARTx, uint8_t ch);
-// 发送字节数组
+// Send an array of bytes
 void Usart_SendByteArr(USART_TypeDef *pUSARTx, uint8_t *byteArr, uint16_t size);
-// 发送字符串
+// Send a string
 void Usart_SendString(USART_TypeDef *pUSARTx, char *str);
-// 将串口发送缓冲区的内容全部发出去
+// Send all content in the UART transmit buffer
 void Usart_SendAll(Usart_DataTypeDef *usart);
 #endif

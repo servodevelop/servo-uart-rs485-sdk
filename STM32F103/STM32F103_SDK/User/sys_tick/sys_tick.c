@@ -1,90 +1,89 @@
 #include "sys_tick.h"
 
-// 记录系统的时间 计时器
+// Record system time, timer
 // __IO = volatile
 static __IO u32 sysTickCnt;
 
-// 系统定时器初始化
+// System timer initialization
 void SysTick_Init(void){
-    // STM32F103系统内核的时钟频率是72MHZ
+    // The clock frequency of the STM32F103 system core is 72MHz
     // SystemCoreClock = SYSCLK_FREQ_72MHz = 72000000
-    // SysTick_Config 函数里面传入的是计数为多少的时候产生一次系统中断
-    // 1s中断一次  -> SystemCoreClock / 1
-    // 1ms中断一次 -> SystemCoreClock / 1000, 1s分成1000个时间片段, 每个片段是1ms
-    // 1us中断一次 -> SystemCoreClock / 1000000
+    // The parameter passed to the SysTick_Config function is the count at which a system interrupt is generated
+    // 1s interrupt once  -> SystemCoreClock / 1
+    // 1ms interrupt once -> SystemCoreClock / 1000, 1s is divided into 1000 time slices, each slice is 1ms
+    // 1us interrupt once -> SystemCoreClock / 1000000
 
-    // 这里设置为1ms中断一次
+    // Set to 1ms interrupt once
 	if(SysTick_Config(SystemCoreClock / 1000)){
-		// 捕获异常
+		// Capture exception
 		while(1);
 	}
     
-    // 关闭嘀嗒定时器
+    // Disable the tick timer
     SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
 }
 
-// 等待计时完成
+// Wait for the timer to complete
 void SysTick_Wait(){
-	// 定时器使能
-	SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk;
-    // 等待直到计时器变为0
+    // Enable the timer
+    SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk;
+    // Wait until the timer reaches 0
     while (sysTickCnt > 0);
-	// 定时器失能
-	SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
+    // Disable the timer
+    SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
 }
 
-// 延时us
+// Delay in microseconds
 void SysTick_DelayUs(__IO u32 nTime){
-    // 设置时钟中断为us级
+    // Set the clock interrupt to microsecond level
     SysTick_Config(SystemCoreClock / 1000000);
     sysTickCnt = nTime;
-    // 等待计时完成
+    // Wait for the timer to complete
     SysTick_Wait();
-    // 重新设置系统中断为ms级
+    // Reconfigure the system interrupt to millisecond level
     SysTick_Config(SystemCoreClock / 1000);
-	// 定时器失能
-	SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
+    // Disable the timer
+    SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
 }
 
-// 延时ms
+// Delay in milliseconds
 void SysTick_DelayMs(__IO u32 nTime){
     sysTickCnt = nTime;
     SysTick_Wait();
 }
 
-// 延时s
+// Delay in seconds
 void SysTick_DelayS(__IO u32 nTime){
     SysTick_DelayMs(nTime * 1000);
 }
 
-// 设置倒计时(非阻塞式)
+// Start a countdown (non-blocking)
 void SysTick_CountdownBegin(__IO u32 nTime){
-    // 这里设置为1ms中断一次
-	sysTickCnt = nTime;
-	// 定时器使能
-	SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk;
+    // Set to interrupt every 1ms here
+    sysTickCnt = nTime;
+    // Enable the timer
+    SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk;
 }
 
-// 撤销倒计时
+// Cancel the countdown
 void SysTick_CountdownCancel(void){
-    // 重置嘀嗒计时器的计数值
+    // Reset the tick counter value
     sysTickCnt = 0;
-	// systick 定时器失能
-	SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
-	
+    // Disable the systick timer
+    SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
 }
 
-// 判断倒计时是否超时
+// Check if the countdown has timed out
 uint8_t SysTick_CountdownIsTimeout(void){
     return sysTickCnt == 0;
 }
 
-// 设置系统定时器中断的回调函数
+// Set the callback function for the system timer interrupt
 void SysTick_Handler(void)
 {
-	if(sysTickCnt > 0){
+    if(sysTickCnt > 0){
         sysTickCnt--;
     }else{
-		sysTickCnt = 0;
-	}
+        sysTickCnt = 0;
+    }
 }

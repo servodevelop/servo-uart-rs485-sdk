@@ -27,19 +27,22 @@
 #include "user_uart.h"
 #include "demo.h"
 #include "stdio.h"
-// 使用串口1作为舵机控制的端�?
-// <接线说明>
-// STM32F103 PA9(Tx)  <----> 总线伺服舵机转接�? Rx
-// STM32F103 PA10(Rx) <----> 总线伺服舵机转接�? Tx
-// STM32F103 GND      <----> 总线伺服舵机转接�? GND
-// STM32F103 V5       <----> 总线伺服舵机转接�? 5V
-// 使用串口2作为日志输出的端�?
-// <接线说明>
-// STM32F103 PA2(Tx) <----> USB转TTL Rx
-// STM32F103 PA3(Rx) <----> USB转TTL Tx
-// STM32F103 GND     <----> USB转TTL GND
-// STM32F103 V5      <----> USB转TTL 5V (可�??)
 
+// Use UART1 as the servo control port
+// <Wiring Instructions>
+// STM32F103 PA9(Tx)    <----> Servo Transceiver Board Rx
+// STM32F103 PA10(Rx)   <----> Servo Transceiver Board Tx
+// STM32F103 GND        <----> Servo Transceiver Board GND
+// STM32F103 V5         <----> Servo Transceiver Board 5V
+// <Notes>
+// Make sure USART1_ENABLE is set to 1 in usart.h before use
+
+// Use UART2 as the logging output port
+// <Wiring Instructions>
+// STM32F103 PA2(Tx) <----> USB-TTL Rx
+// STM32F103 PA3(Rx) <----> USB-TTL Tx
+// STM32F103 GND     <----> USB-TTL GND
+// STM32F103 V5      <----> USB-TTL 5V (optional)
 
 
 /* USER CODE END Includes */
@@ -107,7 +110,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  User_Uart_Init(&huart1);  // 初始化串�?1作为舵机控制的端�?
+  User_Uart_Init(&huart1);
 
   /* USER CODE END 2 */
 

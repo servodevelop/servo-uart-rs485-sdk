@@ -1,50 +1,50 @@
 /*
- * 串口总线舵机示例代码
+ * UART Servo Example Code
  * ---------------------------------------------------
  * ---------------------------------------------------
  */
 #ifndef __FASHION_STAR_USART_SERVO_EXAMPLE_H
 #define __FASHION_STAR_USART_SERVO_EXAMPLE_H
 
-// 导入系统依赖库
+// Import system dependency libraries
 #include "fashion_star_uart_servo.h"
 
-// 变量定义
+// Variable definition
 extern Usart_DataTypeDef *servo_usart;
 
-/* 舵机通讯检测 */
+/* Servo communication test */
 void FSUSExample_PingServo(void);
 
-/* 控制单个舵机的角度 */
+/* Control single servo angle */
 void FSUSExample_SetServoAngle(void);
 
-/* 控制多个舵机的角度 */
+/* Control multiple servos angle */
 void FSUSExample_SetNServoAngle(void);
 
-/* 设置舵机角度(多圈模式) */
+/* Set servo angle (multi-turn mode) */
 void FSUSExample_SetServoAngleMTurn(void);
 
-/* 舵机阻尼模式与角度回传 */
+/* Servo damping mode and angle feedback */
 void FSUSExample_SetServoDamping(void);
 
-/* 用户自定义数据-重置 */
+/* User-defined data - Reset */
 void FSUSExample_ResetData(void);
 
-/* 用户自定义数据-读取 */
+/* User-defined data - Read */
 void FSUSExample_ReadData(void);
 
-/* 用户自定义数据-写入 */
+/* User-defined data - Write */
 void FSUSExample_WriteData(void);
 
-/* 同步命令 */
-void demo_SYNC(void);
+/* Synchronous command control */
+void FSUSExample_SYNC(void);
 
-/* 数据监控 */
-void demo_MONTIOR(void);
+/* Data monitoring - Read servo parameters */
+void FSUSExample_MONTIOR(void);
 
-/* 控制模式停止状态 */
-void demo_StopOnControlMode(void);
+/* Control mode stop state */
+void FSUSExample_StopOnControlMode(void);
 
-/* 开启停止异步命令 */
-void demo_Begin_EndAsync(void);
+/* Enable stop asynchronous */
+void FSUSExample_BEGIN_ENDASYNC(void);
 #endif
