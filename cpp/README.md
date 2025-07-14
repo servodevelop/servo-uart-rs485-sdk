@@ -15,7 +15,7 @@
 
 上位机软件可以调试总线伺服舵机，测试总线伺服舵机的功能。
 
-- 上位机软件：[FashionStar UART总线伺服舵机上位机软件](https://fashionrobo.com/wp-content/uploads/download/Develop-US_1.0.4.171.zip)
+- 上位机软件：[FashionStar UART总线伺服舵机上位机软件](https://fashionrobo.com/downloadcenter/)
 
 - 使用说明：[总线伺服舵机上位机软件使用说明](https://wiki.fashionrobo.com/uartbasic/uart-servo-software/)
 
@@ -424,7 +424,7 @@ int main(){
 
 **注意事项：**
 
-- 舵机只会响应最新的角度控制指令。当需要连续执行多个角度控制命令时，可以在程序中使用延时或者读取角度来判断上一个命令是否完成。
+- 舵机只会响应最新的角度控制指令。当需要连续执行多个角度控制指令时，可以在程序中使用延时或者读取角度来判断上一个指令是否完成。
 - 建议连续发送指令给同一个舵机时，指令间隔在10ms以上。
 - 若power = 0或者大于功率保持值，按照功率保持值执行。功率保持值可在上位机进行设置。
 - 舵机的最大旋转速度因舵机型号、负载情况而异。
@@ -664,7 +664,7 @@ int main(){
 
 **功能简介**
 
-测试控制舵机的角度，演示了三种控制舵机角度的API，在每次执行完角度控制命令后，会调用当前角度查询API得到实时角度。
+测试控制舵机的角度，演示了三种控制舵机角度的API，在每次执行完角度控制指令后，会调用当前角度查询API得到实时角度。
 
 - 简易角度控制 + 当前角度查询
 - 带加减速的角度控制(指定周期) 
@@ -954,7 +954,7 @@ int main(){
 
 **功能简介**
 
-测试控制舵机的角度，演示了三种控制舵机角度的API，在每次执行完角度控制命令后，会调用当前角度查询API得到实时角度。
+测试控制舵机的角度，演示了三种控制舵机角度的API，在每次执行完角度控制指令后，会调用当前角度查询API得到实时角度。
 
 - 简易多圈角度控制 + 当前多圈角度查询
 - 带加减速的多圈角度控制(指定周期) + 当前多圈角度查询
@@ -1125,7 +1125,7 @@ int main(){
 }
 ```
 
-## 11.舵机同步命令
+## 11.舵机同步指令
 
 ### 11.1. `setSyncRawAngle`
 
@@ -1289,7 +1289,7 @@ servo0.setSyncRawAngleMTurnByVelocity(count,servo0.Syncsend);// 设定舵机同�
 
 
 
-### 11.7.例程-同步命令模式功能演示
+### 11.7.例程-同步指令功能演示
 
 **例程源码**
 
@@ -1297,7 +1297,7 @@ servo0.setSyncRawAngleMTurnByVelocity(count,servo0.Syncsend);// 设定舵机同�
 
 ```c++
 /*
- * 同步命令演示
+ * 同步指令演示
  * --------------------------
  * 作者: 深圳市华馨京科技有限公司
  * 网站：https://fashionrobo.com/
@@ -1667,7 +1667,7 @@ int main(){
 
 
 
-## 14.开启停止异步
+## 14.异步指令
 
 ### 14.1. `SetBeginAsync`
 
@@ -1680,7 +1680,7 @@ void FSUS_Servo::SetBeginAsync()
 **使用示例**
 
 ```c++
-servo0.SetBeginAsync();
+servo0.SetBeginAsync(); //异步写入
 ```
 
 ### 14.2. `SetEndAsync`
@@ -1694,17 +1694,17 @@ void FSUS_Servo::SetEndAsync(uint8_t mode)
 **使用示例**
 
 ```c++
-uint8_t endasync_mode = 0;//0执行存储命令，1取消存储命令
-servo0.SetEndAsync(endasync_mode);
+uint8_t endasync_mode = 0;//0执行存储指令，1取消执行存储的指令
+servo0.SetEndAsync(endasync_mode);//异步执行
 ```
 
 
 
-### 14.3.例程-舵机存储命令
+### 14.3.例程-异步指令
 
 **功能简介**
 
-舵机存储一次命令，可选择执行存储的命令或者取消存储的命令
+舵机存储一次指令，可选择执行存储的指令或者取消存储的指令
 
 **例程源码**
 
@@ -1712,7 +1712,7 @@ servo0.SetEndAsync(endasync_mode);
 
 ```c++
 /*
- * 舵机存储一次命令的应用
+ * 舵机存储一次指令异步执行的应用
  * --------------------------
  * 作者: 深圳市华馨京科技有限公司
  * 网站：https://fashionrobo.com/
@@ -1749,7 +1749,7 @@ uint16_t t_acc;     // 加速时间 单位ms
 uint16_t t_dec;     // 减速时间 单位ms
 float velocity;         // 目标转速 单位°/s
 
-uint8_t endasync_mode = 0;//0执行存储命令，1取消存储命令
+uint8_t endasync_mode = 0;//0执行存储指令，1取消执行存储的指令
 
 /* 等待并报告当前的角度*/
 void waitAndReport(FSUS_Servo* servo){
@@ -1770,7 +1770,7 @@ int main(){
     protocol.delay_ms(2000); // 暂停2s
 
     cout << "---------Second send---------" << endl;
-    servo0.SetEndAsync(endasync_mode);//0执行存储命令，1取消存储命令
+    servo0.SetEndAsync(endasync_mode);//0执行存储指令，1取消执行存储的指令
 
 }
 
@@ -1800,7 +1800,7 @@ servo0.querymonitor();
 
 **功能简介**
 
-舵机存储一次命令，可选择执行存储的命令或者取消存储的命令
+获取舵机数据信息
 
 **例程源码**
 
@@ -1865,27 +1865,28 @@ int main(){
 
 ## 16.控制模式停止指令
 
-### 16.1. `querymonitor`
+### 16.1.`SetStopOnControlMode`
 
 **函数原型**
 
 ```c++
-uint16_t FSUS_Servo::querymonitor()
+void FSUS_Servo::SetStopOnControlMode(uint8_t mode, FSUS_POWER_T power)
 ```
 
 **使用示例**
 
 ```c++
-servo0.querymonitor();
+uint8_t stoponcontrol_mode = 0;//控制模式停止指令的模式选择参数  0:卸力(失锁)  1:保持锁力  2:阻尼状态
+servo0.SetStopOnControlMode(stoponcontrol_mode,500);
 ```
 
 
 
-### 15.2.例程-读取舵机的所有数据
+### 16.2.例程-设置停止模式
 
 **功能简介**
 
-在运动过程中可以发送该命令让舵机进入不同的状态
+在运动过程中可以发送该指令让舵机进入不同的状态
 
 **例程源码**
 
