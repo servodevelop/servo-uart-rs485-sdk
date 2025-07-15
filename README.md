@@ -8,13 +8,13 @@
 | -------- | ------------------------ |
 | 25/07/02 | 建立仓库，与官网版本一致 |
 | 25/07/04 | 同步文档                 |
-|          |                          |
+| 25/07/15 | 更新ROS2 SDK             |
 
 
 
 ### 仓库说明
 
-该仓库包括华馨京科技 uart&rs485 系列舵机的所有常见编程语言的SDK例程。
+该仓库包括华馨京科技 uart&rs485 系列舵机的SDK例程。
 
 通信协议以及更多资料请参考： [Fashion Star Wiki](https://wiki.fashionrobo.com/)
 
@@ -29,5 +29,6 @@
 | python       | python SDK                    |
 | micro-python | micro-python SDK              |
 | arduino      | arduino SDK                   |
+| ROS2         | ROS2 python SDK               |
 
-fashionstar屌炸天
+
