@@ -14,16 +14,17 @@ import serial
 
 SERVO_DRIVER_NODE = "servo_driver_node" 
 SERVO_ANGLE_PUBLISHER = "servo_angle_topic"
+
 SERVO_PORT_NAME = "/dev/ttyUSB0"  
-SERVO_BAUDRATE = 100_0000
+SERVO_BAUDRATE = 115200
 
 ID_list = [0]               #SERVO id
-ANGLE_list=[-50.0]           # degree
+ANGLE_list=[50.0]           # degree
 INTERVAL_list = [1000]      # ms
 
 # # if servo num >1
-# ID_list = [0,1]        
-# ANGLE_list=[50.0,70.0]      
+# ID_list = [0,1]
+# ANGLE_list=[50.0,70.0]
 # INTERVAL_list = [1000,2000]
 
 class uservo_sdk:
@@ -109,8 +110,6 @@ class servo_contorl(Node):
 
     def timer_callback(self):
         self.publish_angle()
-
-
 
 
 
