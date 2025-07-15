@@ -18,20 +18,26 @@ ROS2:           humble
 
 ## 2.安装依赖
 
-安装python依赖
+1. 自行安装ROS2 humble相关环境。
 
-```sh
-pip install fashionstar-uart-sdk
+2. 安装python sdk。
 
+   ```sh
+   pip install fashionstar-uart-sdk
+   
+   
+   pip install pyserial
+   ```
 
-pip install pyserial
-```
+   
 
 
 
 
 
 ## 3.运行 servo_driver 节点
+
+进入ROS2文件夹，
 
 ```sh
 colcon build
@@ -51,7 +57,7 @@ ros2 run servo_driver driver
 
 ## 4.设置节点功能
 
-进入到ros2/src/servo_driver文件夹，打开文件 **servo_driver.py** 。根据需要，修改代码使用。在修改好代码后，重新运行节点。
+进入到ROS2/src/servo_driver文件夹，打开文件 **servo_driver.py** 。根据需要，修改代码使用。在修改好代码后，重新运行节点。
 
 
 
