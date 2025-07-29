@@ -14,7 +14,7 @@ import fashionstar_uart_sdk as uservo
 
 SERVO_PORT_NAME =  '/dev/ttyUSB0' 
 SERVO_BAUDRATE = 115200 
-SERVO_BAUDRATE = 1000000 
+# SERVO_BAUDRATE = 1000000 
 SERVO_ID = 0  # servo id
 
 # uart init
@@ -22,6 +22,6 @@ uart = serial.Serial(port=SERVO_PORT_NAME, baudrate=SERVO_BAUDRATE,parity=serial
 control = uservo.UartServoManager(uart)
 
 
-control.stop_on_control_mode(SERVO_ID, method=0x10)
-# control.stop_on_control_mode(SERVO_ID, method=0x11, power=500)
+# control.stop_on_control_mode(SERVO_ID, method=0x10, power=0)
+control.stop_on_control_mode(SERVO_ID, method=0x11, power=500)
 # control.stop_on_control_mode(SERVO_ID, method=0x12, power=500)
