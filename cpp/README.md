@@ -114,6 +114,7 @@ cd build
 cmake ..
 make
 sudo make install
+sudo ldconfig
 ```
 
 **安装日志**
@@ -160,6 +161,7 @@ FashionStar总线伺服舵机，通信部分使用的是[CSerialPort](https://gi
    cmake .. -D CMAKE_INSTALL_PREFIX="D:/KyleSoftware/CPP_LIBRARIES/"
    make
    sudo make install
+   sudo ldconfig
    ```
 
 **安装日志**
