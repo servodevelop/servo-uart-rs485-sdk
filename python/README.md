@@ -16,15 +16,11 @@
 
 - 使用说明：[总线伺服舵机上位机软件使用说明](https://wiki.fashionrobo.com/uartbasic/uart-servo-software/)
 
-### 1.2.SDK
-
-本文例程、API下载。
-
-- Python_SDK下载链接：[SDK for Python](https://fashionrobo.com/downloadcenter/)
 
 
 
-### 1.3.图例
+
+### 1.2.图例
 
 HP8-U45-M总线伺服舵机
 
@@ -44,51 +40,38 @@ HP8-U45-M总线伺服舵机
 2. 将TTL/USB调试转换板UC-01与控制器、总线伺服舵机以及电源连接。
 
 
+## 安装方法
+
+```shell
+
+pip install fashionstar-uart-sdk
+
+```
 
 ## 3.创建总线伺服舵机管理器
 
-总线伺服舵机的文件路径`fashionstar-uart-servo-python/src/uservo.py`， 使用的时候可以将`uservo.py` 拷贝至你当前工程文件夹里面。 
 
-或者使用的时候，将`uservo.py`所在的文件夹添加到系统路径里面， 相对路径/绝对路径都可以。
-
-```python
-# 添加uservo.py的系统路径
-import sys
-sys.path.append("../../src")
-```
-
-然后使用的过程中一般需要导入如下这两个依赖
+然后使用的过程中一般需要导入如下依赖
 
 ```python
-# PySerial 负责串口总线通信
+import time
 import serial
-# UartServoManager 总线伺服舵机管理器
-from uservo import UartServoManager
+import fashionstar_uart_sdk as uservo
 ```
 
 接下来要创建串口对象，指定相关的参数
 
 ```python
-# 参数配置
-# 角度定义
-SERVO_PORT_NAME =  'COM7' # 舵机串口号
-SERVO_BAUDRATE = 115200 # 舵机的波特率
-SERVO_ID = 0  # 舵机的ID号
 
-# 初始化串口
-uart = serial.Serial(port=SERVO_PORT_NAME, baudrate=SERVO_BAUDRATE,\
-					 parity=serial.PARITY_NONE, stopbits=1,\
-					 bytesize=8,timeout=0)
+SERVO_PORT_NAME =  '/dev/ttyUSB0'  
+SERVO_BAUDRATE = 115200 
+SERVO_ID = 0  # servo id
+
+# uart init
+uart = serial.Serial(port=SERVO_PORT_NAME, baudrate=SERVO_BAUDRATE,parity=serial.PARITY_NONE, stopbits=1,bytesize=8,timeout=0)
+control = uservo.UartServoManager(uart)
+
 ```
-
-创建舵机管理器，将串口对象传入到构造器`UartServoManager`里面.
-
-```python
-# 初始化舵机管理器
-uservo = UartServoManager(uart)
-```
-
-
 
 ## 4.舵机通信检测
 
@@ -112,48 +95,6 @@ def ping(self, servo_id:int):
 
 * `is_online` : 舵机是否在线
 
-
-
-### 4.2.例程源码
-
-`example/ping.py`
-
-```python
-'''
-伺服总线舵机
-> Python SDK舵机通讯检测 Example <
---------------------------------------------------
- * 作者: 深圳市华馨京科技有限公司
- * 网站：https://fashionrobo.com/
- * 更新时间: 2023/03/13
---------------------------------------------------
-'''
-# 添加uservo.py的系统路径
-import sys
-sys.path.append("../../src")
-# 导入依赖
-import time
-import serial
-from uservo import UartServoManager
-
-# 参数配置
-# 角度定义
-SERVO_PORT_NAME =  'COM7' # 舵机串口号
-SERVO_BAUDRATE = 115200 # 舵机的波特率
-SERVO_ID = 0  # 舵机的ID号
-
-# 初始化串口
-uart = serial.Serial(port=SERVO_PORT_NAME, baudrate=SERVO_BAUDRATE,\
-					 parity=serial.PARITY_NONE, stopbits=1,\
-					 bytesize=8,timeout=0)
-# 初始化舵机管理器
-uservo = UartServoManager(uart)
-
-# 舵机通讯检测
-is_online = uservo.ping(SERVO_ID)
-print("舵机ID={} 是否在线: {}".format(SERVO_ID, is_online))
-
-```
 
 
 
