@@ -23,7 +23,7 @@
 
 | 文件夹       | 描述                                                       |
 | ------------ | ---------------------------------------------------------- |
-| PC——Software | Develop-US：PC上位机<br>Serial Port Debugger：串口调试软件 |
+| PC—Software | Develop-US：PC上位机<br>Serial Port Debugger：串口调试软件 |
 | STM32F103    | STM32F103 SDK（HAL库&标准库）                              |
 | STM32F407    | STM32F407 SDK（HAL库&标准库）                              |
 | cpp          | C++ SDK                                                    |
