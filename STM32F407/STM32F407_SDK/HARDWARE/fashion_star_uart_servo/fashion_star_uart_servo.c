@@ -614,7 +614,7 @@ FSUS_STATUS FSUS_SetOriginPoint(Usart_DataTypeDef *usart, uint8_t servo_id)
 {
 	uint8_t statusCode; 
 
-	FSUS_SendPackage_Common(usart, FSUS_CMD_SET_ORIGIN_POINT, 1, &servo_id,0);
+	FSUS_SendPackage_Common(usart, FSUS_CMD_SET_ORIGIN_POINT, 2, &servo_id,0);
 
 	return statusCode;
 }
