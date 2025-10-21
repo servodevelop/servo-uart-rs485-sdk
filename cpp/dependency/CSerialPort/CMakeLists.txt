@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.5)
 
 # 工程名: CSerialPort
 # 指定编程语言为c++
@@ -21,6 +21,8 @@ message(STATUS "    Build Type : ${CMAKE_BUILD_TYPE}${CMAKE_CONFIGURATION_TYPES}
 message(STATUS "    Shared Library  : ${BUILD_SHARED_LIBS}")
 message(STATUS "    Build Examples  : ${CSERIALPORT_BUILD_EXAMPLES}")
 message(STATUS "    Build Test  : ${CSERIALPORT_BUILD_TEST}")
+# 打印目标架构
+message(STATUS "	Target architecture: ${CMAKE_SYSTEM_PROCESSOR}")
 message(STATUS "=======================================================")
 
 # libcserialport
