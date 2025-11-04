@@ -326,7 +326,7 @@ public:
 
     // 构造体
     FSUS_Protocol(std::string port_name, itas109::BaudRate baudrate);
-
+    ~FSUS_Protocol();
     // 获取当前的时间戳，单位ms
     uint32_t millis();
     // 延时ms

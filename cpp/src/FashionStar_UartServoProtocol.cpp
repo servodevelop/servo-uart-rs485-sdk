@@ -27,6 +27,12 @@ FSUS_Protocol::FSUS_Protocol(std::string port_name,  itas109::BaudRate baudrate)
 	}
 }
 
+FSUS_Protocol::~FSUS_Protocol()
+{
+ this->serial.close();
+}
+
+
  // 获取当前的时间戳，单位ms
 uint32_t FSUS_Protocol::millis(){
     // 延时函数定义
