@@ -7,6 +7,8 @@
 - 基于[总线伺服舵机通信协议](https://wiki.fashionrobo.com/uartbasic/uart-protocol/)的C#方法，适用于所有总线伺服舵机型号。
 - C#开发编程示例UARTServoDemo
 
+- 新增的方法與事件大多在 ServoController.Tx.cs 以及 ServoController.Rx.cs 兩個檔案內，請参照協議文件比對測試。同步命令範例在 MainForm.cs内SyncCommandTest()函式
+
 ### 1.1.上位机软件
 
 上位机软件可以调试总线伺服舵机，测试总线伺服舵机的功能。
