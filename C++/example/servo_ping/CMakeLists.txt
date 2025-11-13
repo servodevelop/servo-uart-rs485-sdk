@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.5)
 # 设置工程名称, 设定版本
 project(SERVO_PING VERSION 1.0)
 
@@ -18,7 +18,7 @@ endif()
 # 添加依赖的.h文件路径(即hello.h所在的文件夹)
 include_directories(${CMAKE_INSTALL_PREFIX}/include)
 # # 添加link文件夹
-link_directories(${CMAKE_INSTALL_PREFIX}/bin)
+link_directories(${CMAKE_INSTALL_PREFIX}/lib)
 
 # 添加可执行程序hello_demo
 add_executable(servo_ping servo_ping.cpp)
