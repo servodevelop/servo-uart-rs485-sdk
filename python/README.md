@@ -1,57 +1,43 @@
-# 总线伺服舵机SDK使用手册（Python）
-请注意，本python手册暂未更新完成，如有疑问可联系我们。
+# 总线伺服舵机 Python SDK 开发指南
 
 
-## 1.概述
+## 1. 概述
 
-本SDK内容有
-
-- 基于[总线伺服舵机通信协议](https://wiki.fashionrobo.com/uartbasic/uart-protocol/)的Python的API函数，适用于所有总线伺服舵机型号。
-
-### 1.1.上位机软件
-
-上位机软件可以调试总线伺服舵机，测试总线伺服舵机的功能。
-
-- 上位机软件：[FashionStar UART总线伺服舵机上位机软件](https://fashionrobo.com/downloadcenter)
-
-- 使用说明：[总线伺服舵机上位机软件使用说明](https://wiki.fashionrobo.com/uartbasic/uart-servo-software/)
+本 SDK 基于 Fashion Star 总线伺服舵机的 [UART/RS485 通信协议](https://wiki.fashionstar.com.hk/uart-servo/protocols/uart-rs485-protocol.md) 开发，提供 Python API，适用于全系列舵机型号。
 
 
+## 2. 准备工作
+
+### 2.1 物理接线
+
+请按照以下顺序完成舵机与电脑的硬件连接：
+
+1. 用数据线连接舵机与转接板；
+2. 接通舵机外部电源；
+3. 使用 USB 数据线将转接板连接至电脑。
+
+![物理连线](./images/pc-config-software-02.png)
 
 
-
-### 1.2.图例
-
-HP8-U45-M总线伺服舵机
-
-![](./images/u45-slide-01.png)
-
-总线伺服舵机转接板UC-01
-
-![](./images/1.4.png)
+> [!WARNING]
+> - 转接板输入电压必须与舵机电源输入范围一致，否则会触发电压保护，设备将无法正常使用。
+> - 请[下载](https://file.wch.cn/download/file?id=5)并安装USB转TTL模块的驱动程序。
 
 
+### 2.2 总线伺服舵机调试软件
+- 请参考《[总线伺服舵机调试软件](https://wiki.fashionstar.com.hk/uart-servo/software/pc-config-software.md)》提前分配 ID 或修改配置参数。
 
-
-
-## 2.接线说明
-
-1. 安装USB转TTL模块的驱动程序。
-2. 将TTL/USB调试转换板UC-01与控制器、总线伺服舵机以及电源连接。
-
-
-**安装方法**
+### 2.3 安装方法
 
 ```shell
-
 pip install fashionstar-uart-sdk
 
 ```
 
-## 3.创建总线伺服舵机管理器
+## 3. 创建总线伺服舵机管理器
 
 
-然后使用的过程中一般需要导入如下依赖
+- 然后使用的过程中一般需要导入如下依赖
 
 ```python
 import time
@@ -59,7 +45,7 @@ import serial
 import fashionstar_uart_sdk as uservo
 ```
 
-接下来要创建串口对象，指定相关的参数
+- 接下来要创建串口对象，指定相关的参数
 
 ```python
 
@@ -73,11 +59,11 @@ control = uservo.UartServoManager(uart)
 
 ```
 
-## 4.舵机通信检测
+## 4. 舵机通信检测
 
 
 
-### 4.1.API-`ping` 
+### 4.1 API-`ping`
 
 调用舵机的`ping()` 函数用于舵机的通信检测, 判断舵机是否在线。
 
@@ -98,11 +84,11 @@ def ping(self, servo_id:int):
 
 
 
-## 5.舵机阻尼模式
+## 5. 舵机阻尼模式
 
 
 
-### 5.1.API-`set_damping` 
+### 5.1 API-`set_damping`
 
 设置舵机为阻尼模式。
 
@@ -123,7 +109,7 @@ def set_damping(self, servo_id, power=0):
 
 
 
-### 5.2.例程源码
+### 5.2 例程源码
 
 ```python
 '''
@@ -151,8 +137,8 @@ SERVO_ID = 0  # 舵机的ID号
 
 # 初始化串口
 uart = serial.Serial(port=SERVO_PORT_NAME, baudrate=SERVO_BAUDRATE,\
-					 parity=serial.PARITY_NONE, stopbits=1,\
-					 bytesize=8,timeout=0)
+                     parity=serial.PARITY_NONE, stopbits=1,\
+                     bytesize=8,timeout=0)
 # 初始化舵机管理器
 uservo = UartServoManager(uart)
 
@@ -162,11 +148,11 @@ uservo.set_damping(SERVO_ID, power)
 
 
 
-## 6.舵机角度查询
+## 6. 舵机角度查询
 
 
 
-### 6.1.API-`query_servo_angle` 
+### 6.1 API-`query_servo_angle`
 
 **函数原型**
 
@@ -182,18 +168,16 @@ def query_servo_angle(self, servo_id):
 
 * `angle` : 舵机角度(单圈/多圈）
 
-**注意事项**
-
-注意这里返回的角度是多圈模式的角度还是单圈模式的角度，取决于上次控制舵机的角度的指令是单圈模式还是/多圈模式， 默认为单圈。 
-
-如果想人为的设定查询多圈/单圈，可以在查询之前设定`uservo.servos[servo_id].is_mturn` 这个布尔值。 
-
-* `is_mturn=True` : 返回多圈角度
-* `is_mturn=False`: 返回单圈角度
+> [!NOTE]
+> - 注意这里返回的角度是多圈模式还是单圈模式，取决于上次控制舵机的角度指令是单圈模式还是多圈模式，默认为单圈。  
+> - 如需手动指定查询多圈/单圈，请在查询前设置 `uservo.servos[servo_id].is_mturn`：  
+>     - `is_mturn=True`：返回多圈角度  
+>     - `is_mturn=False`：返回单圈角度
 
 
 
-### 6.2.例程源码
+
+### 6.2 例程源码
 
 设置舵机为阻尼模式，转动舵机 1s打印一下当前的角度。
 
@@ -225,8 +209,8 @@ SERVO_ID = 0  # 舵机的ID号
 
 # 初始化串口
 uart = serial.Serial(port=SERVO_PORT_NAME, baudrate=SERVO_BAUDRATE,\
-					 parity=serial.PARITY_NONE, stopbits=1,\
-					 bytesize=8,timeout=0)
+                     parity=serial.PARITY_NONE, stopbits=1,\
+                     bytesize=8,timeout=0)
 # 初始化舵机管理器
 uservo = UartServoManager(uart)
 
@@ -242,9 +226,9 @@ while True:
 
 
 
-## 7.设置舵机角度
+## 7. 设置舵机角度
 
-### 7.1.API-`set_servo_angle` 
+### 7.1 API-`set_servo_angle`
 
 设置舵机角度，这个API包含了6种舵机角度控制模式，通过传入不同的参数调用不同的指令。
 
@@ -275,7 +259,7 @@ def set_servo_angle(self, servo_id:int, angle:float, is_mturn:bool=False, interv
 
 
 
-### 7.2.API-`wait`  
+### 7.2 API-`wait`
 
 等待所有的舵机到达目标角度。
 
@@ -293,7 +277,7 @@ def wait(self, timeout=None):
 
 * 无
 
-### 7.3.例程源码
+### 7.3 例程源码
 
 ```python
 '''
@@ -322,8 +306,8 @@ SERVO_ID = 0  # 舵机的ID号
 
 # 初始化串口
 uart = serial.Serial(port=SERVO_PORT_NAME, baudrate=SERVO_BAUDRATE,\
-					 parity=serial.PARITY_NONE, stopbits=1,\
-					 bytesize=8,timeout=0)
+                     parity=serial.PARITY_NONE, stopbits=1,\
+                     bytesize=8,timeout=0)
 # 初始化舵机管理器
 uservo = UartServoManager(uart, is_debug=True)
 
@@ -366,7 +350,7 @@ print("-> {}".format(uservo.query_servo_angle(SERVO_ID)))
 
 ```
 
-## 8.清除多圈圈数
+## 8. 清除多圈圈数
 
 该API用于清除多圈圈数，须在失锁状态下使用。
 
@@ -388,177 +372,13 @@ def reset_multi_turn_angle(self, servo_id:int):
 
 
 
-##  9.轮转模式(316版本以及后续版本已弃用)
+## 9. 用户自定义参数修改
 
+> [!NOTE]
+> **注意事项：**
+> 如需修改用户自定义参数，建议在上位机中操作，更加方便直观。
 
-
-### 9.1.API-`wheel_stop`
-
-轮转模式停止转动。
-
-**函数原型**
-
-```python
-def wheel_stop(self, servo_id):
-```
-
-**输入参数**
-
-* `servo_id`: 舵机ID
-
-**输出参数**
-
-* 无
-
-
-
-### 9.2.API-`set_wheel_norm` 
-
-设置轮转普通模式，转速单位: °/s
-
-**函数原型**
-
-```python
-def set_wheel_norm(self, servo_id, is_cw=True, mean_dps=None)
-```
-
-**输入参数**
-
-* `servo_id`: 舵机ID
-* `is_cw`: 是否是顺时针：`True`: 顺时针，`False`: 逆时针
-* `mean_dps`: 平均转速
-
-**输出参数**
-
-* 无
-
-
-
-### 9.3.API-`set_wheel_turn` 
-
-轮转模式，让舵机旋转特定的圈数。
-
-**函数原型**
-
-```python
-def set_wheel_turn(self, servo_id, turn=1, is_cw=True, mean_dps=None, is_wait=True):
-```
-
-**输入参数**
-
-* `servo_id` : 舵机ID
-* `turn`: 目标要旋转的圈数
-* `is_cw`: 旋转方向，是否为顺时针
-  * `True`: 顺时针
-  * `False`: 逆时针
-* `mean_dps`: 平均转速
-* `is_wait`: 是否是阻塞式等待
-
-**输出参数**
-
-* 无
-
-
-
-### 9.4.API-`set_wheel_time`
-
-轮转模式，旋转特定的时间。
-
-**函数原型**
-
-```python
-def set_wheel_time(self, servo_id, interval=1000, is_cw=True, mean_dps=None, is_wait=True):
-```
-
-**输入参数**
-
-* `servo_id` : 舵机ID
-* `interval`: 目标要旋转的时间, 单位ms
-* `is_cw`: 旋转方向，是否为顺时针
-  * `True`: 顺时针
-  * `False`: 逆时针
-* `mean_dps`: 平均转速, 单位dps
-* `is_wait`: 是否是阻塞式等待
-
-**输出参数**
-
-* 无
-
-
-
-### 9.5.例程源码
-
-`src/wheel.py`
-
-```python
-'''
-伺服总线舵机
-> Python SDK 舵机轮转模式测试 <
---------------------------------------------------
- * 作者: 深圳市华馨京科技有限公司
- * 网站：https://fashionrobo.com/
- * 更新时间: 2023/03/13
---------------------------------------------------
-'''
-# 添加uservo.py的系统路径
-import sys
-sys.path.append("../../src")
-# 导入依赖
-import time
-import serial
-from uservo import UartServoManager
-
-# 参数配置
-# 角度定义
-SERVO_PORT_NAME =  'COM7' # 舵机串口号
-SERVO_BAUDRATE = 115200 # 舵机的波特率
-SERVO_ID = 0  # 舵机的ID号
-
-# 初始化串口
-uart = serial.Serial(port=SERVO_PORT_NAME, baudrate=SERVO_BAUDRATE,\
-					 parity=serial.PARITY_NONE, stopbits=1,\
-					 bytesize=8,timeout=0)
-# 初始化舵机管理器
-uservo = UartServoManager(uart)
-
-print("测试常规模式")
-
-# 设置舵机为轮转普通模式
-# 旋转方向(is_cw) : 顺时针
-# 角速度(mean_dps) : 单位°/s
-uservo.set_wheel_norm(SERVO_ID, is_cw=True, mean_dps=200.0)
-
-# 延时5s然后关闭
-time.sleep(5.0)
-
-# 停止
-uservo.wheel_stop(SERVO_ID)
-
-time.sleep(1)
-
-# 定圈模式
-print("测试定圈模式")
-uservo.set_wheel_turn(SERVO_ID, turn=5, is_cw=False, mean_dps=200.0)
-
-# 定时模式
-print("测试定时模式")
-uservo.set_wheel_time(SERVO_ID, interval=5000, is_cw=True, mean_dps=200.0)
-
-```
-
-
-
-## 10.用户自定义参数修改
-
-</td></tr></table><table><tr><td bgcolor=#DDDDDD>
-
-**注意事项：**
-
-- 如有修改用户自定义参数的需要，可以在上位机进行，更加方便，直观。
-
-</td></tr></table>
-
-### 10.1.API-`reset_user_data`
+### 9.1 API-`reset_user_data`
 
 重置用户数据表, 恢复默认值。
 
@@ -578,7 +398,7 @@ def reset_user_data(self, servo_id):
 
 
 
-### 10.2.API-`read_data` 
+### 9.2 API-`read_data`
 
 读取数据。
 
@@ -599,7 +419,7 @@ def read_data(self, servo_id, address):
 
 
 
-### 10.3.API-`write_data`
+### 9.3 API-`write_data`
 
 写入数据。
 
@@ -621,7 +441,7 @@ def write_data(self, servo_id, address, content):
 
 
 
-### 10.4.例程源码-重置用户数据表
+### 9.4 例程源码-重置用户数据表
 
 `example/reset_user_data.py`
 
@@ -660,8 +480,8 @@ SOFTSTART_CLOSE = 0 # 上电缓启动-关闭
 
 # 初始化串口
 uart = serial.Serial(port=SERVO_PORT_NAME, baudrate=SERVO_BAUDRATE,\
-					 parity=serial.PARITY_NONE, stopbits=1,\
-					 bytesize=8,timeout=0)
+                     parity=serial.PARITY_NONE, stopbits=1,\
+                     bytesize=8,timeout=0)
 # 初始化舵机管理器
 uservo = UartServoManager(uart, is_debug=True)
 # 重置用户数据
@@ -690,7 +510,7 @@ print("舵机扫描结束, 舵机列表: {}".format(servo_list))
 
 
 
-### 10.5.例程源码-读取内存表
+### 9.5 例程源码-读取内存表
 
 `example/read_data.py`
 
@@ -723,8 +543,8 @@ ADDRESS_VOLTAGE = 1 # 总线电压值的地址
 
 # 初始化串口
 uart = serial.Serial(port=SERVO_PORT_NAME, baudrate=SERVO_BAUDRATE,\
-					 parity=serial.PARITY_NONE, stopbits=1,\
-					 bytesize=8,timeout=0)
+                     parity=serial.PARITY_NONE, stopbits=1,\
+                     bytesize=8,timeout=0)
 # 初始化舵机管理器
 uservo = UartServoManager(uart)
 
@@ -742,7 +562,7 @@ print("总线电压 {} mV".format(voltage))
 
 
 
-### 10.6.例程源码-写入内存表
+### 9.6 例程源码-写入内存表
 
 `example/write_data.py`
 
@@ -778,8 +598,8 @@ SOFTSTART_CLOSE = 0 # 上电缓启动-关闭
 
 # 初始化串口
 uart = serial.Serial(port=SERVO_PORT_NAME, baudrate=SERVO_BAUDRATE,\
-					 parity=serial.PARITY_NONE, stopbits=1,\
-					 bytesize=8,timeout=0)
+                     parity=serial.PARITY_NONE, stopbits=1,\
+                     bytesize=8,timeout=0)
 # 初始化舵机管理器
 uservo = UartServoManager(uart)
 
@@ -795,11 +615,11 @@ print("缓启动数据写入是否成功: {}".format(ret))
 
 
 
-## 11.系统状态查询
+## 10. 系统状态查询
 
 
 
-### 11.1.API-`query_voltage`
+### 10.1 API-`query_voltage`
 
 查询当前的电压
 
@@ -819,7 +639,7 @@ def query_voltage(self, servo_id)
 
 
 
-### 11.2.API-`query_current`
+### 10.2 API-`query_current`
 
 查询当前的电流
 
@@ -839,7 +659,7 @@ def query_current(self, servo_id):
 
 
 
-### 11.3.API-`query_power`
+### 10.3 API-`query_power`
 
 查询当前的功率
 
@@ -859,7 +679,7 @@ def query_power(self, servo_id)
 
 
 
-### 11.4.API-`query_temperature`
+### 10.4 API-`query_temperature`
 
 查询舵机当前的温度
 
@@ -877,7 +697,7 @@ def query_temperature(self, servo_id)
 
 * `temperature`: 温度，ADC值
 
-### 11.5.API-`query_status`
+### 10.5 API-`query_status`
 
 查询舵机当前的工作状态
 
@@ -907,7 +727,7 @@ def query_status(self, servo_id)
 
 * `status`: 8位工作状态标志位
 
-### 11.6.例程源码
+### 10.6 例程源码
 
 `example/servo_status.py`
 
@@ -940,8 +760,8 @@ SERVO_ID = 0  # 舵机的ID号
 
 # 初始化串口
 uart = serial.Serial(port=SERVO_PORT_NAME, baudrate=SERVO_BAUDRATE,\
-					 parity=serial.PARITY_NONE, stopbits=1,\
-					 bytesize=8,timeout=0)
+                     parity=serial.PARITY_NONE, stopbits=1,\
+                     bytesize=8,timeout=0)
 # 初始化舵机管理器
 uservo = UartServoManager(uart)
 
@@ -956,14 +776,14 @@ def log_servo_status():
     # 读取温度
     temp = uservo.query_temperature(SERVO_ID)
     #  舵机工作状态标志位
-	#  BIT[0] - 执行指令置1，执行完成后清零。
-	#  BIT[1] - 执行指令错误置1，在下次正确执行后清零。
-	#  BIT[2] - 堵转错误置1，解除堵转后清零。
-	#  BIT[3] - 电压过高置1，电压恢复正常后清零。
-	#  BIT[4] - 电压过低置1，电压恢复正常后清零。
-	#  BIT[5] - 电流错误置1，电流恢复正常后清零。
-	#  BIT[6] - 功率错误置1，功率恢复正常后清零。
-	#  BIT[7] - 温度错误置1，温度恢复正常后清零。
+    #  BIT[0] - 执行指令置1，执行完成后清零。
+    #  BIT[1] - 执行指令错误置1，在下次正确执行后清零。
+    #  BIT[2] - 堵转错误置1，解除堵转后清零。
+    #  BIT[3] - 电压过高置1，电压恢复正常后清零。
+    #  BIT[4] - 电压过低置1，电压恢复正常后清零。
+    #  BIT[5] - 电流错误置1，电流恢复正常后清零。
+    #  BIT[6] - 功率错误置1，功率恢复正常后清零。
+    #  BIT[7] - 温度错误置1，温度恢复正常后清零。
     status = uservo.query_status(SERVO_ID)
     print("Voltage: {:4.1f}V; Current: {:4.1f}A; Power: {:4.1f}W; T: {:2.0f}; Status: {:08b}".format(voltage, current, power, temp,status), end='\r')
 
@@ -983,17 +803,12 @@ while True:
     time.sleep(1)
 ```
 
-## 12.舵机失锁
+## 11. 舵机失锁
 
-</td></tr></table><table><tr><td bgcolor=#DDDDDD>
+> [!WARNING]
+> - 失锁状态下，舵机仍会响应指令。
 
-**注意事项：**
-
-- 失锁状态下，舵机仍会响应指令。
-
-</td></tr></table>
-
-### 12.1.API-`disable_torque`
+### 11.1 API-`disable_torque`
 
 **函数原型**
 
@@ -1009,22 +824,17 @@ def disable_torque(self, servo_id:int):
 
 * 无
 
-## 13.原点设置
+## 12. 原点设置
 
-</td></tr></table><table><tr><td bgcolor=#DDDDDD>
+> [!WARNING]
+> - 仅适用于使用绝对值编码器的舵机（型号尾缀 -M ）。
+> - 需要在失锁状态下使用本 API。
 
-**注意事项**：
-
-- 仅适用于无刷磁编码舵机
-- 需要在失锁状态下使用本API
-
-</td></tr></table>
-
-### 13.1.API-`set_origin_point`
+### 12.1 API-`set_origin_point`
 
 **函数原型**
 
-```C
+```python
 uservo.set_origin_point(self, servo_id:int):
 ```
 
@@ -1036,7 +846,7 @@ uservo.set_origin_point(self, servo_id:int):
 
 * 无
 
-### 13.2.例程源码
+### 12.2 例程源码
 
 `example/set_origin_point.py`
 
@@ -1068,8 +878,8 @@ SERVO_ID = 0  # 舵机的ID号
 
 # 初始化串口
 uart = serial.Serial(port=SERVO_PORT_NAME, baudrate=SERVO_BAUDRATE,\
-					 parity=serial.PARITY_NONE, stopbits=1,\
-					 bytesize=8,timeout=0)
+                     parity=serial.PARITY_NONE, stopbits=1,\
+                     bytesize=8,timeout=0)
 # 初始化舵机管理器
 uservo = UartServoManager(uart)
 
@@ -1090,7 +900,7 @@ print("设置新的原点后舵机角度: {:4.1f} °".format(angle), end='\n')
 
 ```
 
-## 14.同步命令
+## 13. 同步命令
 
 > 注：**仅适用于无刷磁编码舵机V316及之后的版本**
 
@@ -1106,7 +916,7 @@ print("设置新的原点后舵机角度: {:4.1f} °".format(angle), end='\n')
 | 15         | MoveOnMultiTurnAngleModeExByVelocity | 多圈角度控制(基于目标速度)   |
 | 22         | ServoMonitor                         | 舵机数据监控                 |
 
-### 14.1.API-`send_sync_angle`
+### 13.1 API-`send_sync_angle`
 
 **函数原型**
 
@@ -1124,7 +934,7 @@ def send_sync_angle(self, command_id, servo_num, command_data_list):
 
 - 无
 
-### 14.2.API-`send_sync_anglebyinterval`
+### 13.2 API-`send_sync_anglebyinterval`
 
 **函数原型**
 
@@ -1142,7 +952,7 @@ def send_sync_anglebyinterval(self, command_id, servo_num, command_data_list):
 
 - 无
 
-### 14.3.API-`send_sync_anglebyvelocity`
+### 13.3 API-`send_sync_anglebyvelocity`
 
 **函数原型**
 
@@ -1160,7 +970,7 @@ def send_sync_anglebyvelocity(self, command_id, servo_num, command_data_list):
 
 - 无
 
-### 14.4.API-`send_sync_multiturnangle`
+### 13.4 API-`send_sync_multiturnangle`
 
 **函数原型**
 
@@ -1178,7 +988,7 @@ def send_sync_multiturnangle(self, command_id, servo_num, command_data_list):
 
 - 无
 
-### 14.5.API-`send_sync_multiturnanglebyinterval`
+### 13.5 API-`send_sync_multiturnanglebyinterval`
 
 **函数原型**
 
@@ -1198,11 +1008,11 @@ def send_sync_multiturnanglebyinterval(self, command_id, servo_num, command_data
 
 - 
 
-### 14.6.API-`send_sync_multiturnanglebyvelocity`
+### 13.6 API-`send_sync_multiturnanglebyvelocity`
 
 **函数原型**
 
-```c
+```python
 uservo.set_origin_point(self, servo_id:int):
 ```
 
@@ -1216,7 +1026,7 @@ uservo.set_origin_point(self, servo_id:int):
 
 - 无
 
-### 14.7.API-`send_sync_servo_monitor`
+### 13.7 API-`send_sync_servo_monitor`
 
 **函数原型**
 
@@ -1241,7 +1051,7 @@ def send_sync_servo_monitor(self, servo_ids):
 - 角度
 - 圈数
 
-### 14.8.例程源码
+### 13.8 例程源码
 
 `example/sync_mode`
 
@@ -1350,8 +1160,8 @@ SERVO_ID = 0  # 舵机的ID号
 
 # 初始化串口
 uart = serial.Serial(port=SERVO_PORT_NAME, baudrate=SERVO_BAUDRATE,\
-					 parity=serial.PARITY_NONE, stopbits=1,\
-					 bytesize=8,timeout=0)
+                     parity=serial.PARITY_NONE, stopbits=1,\
+                     bytesize=8,timeout=0)
 # 初始化舵机管理器
 uservo = UartServoManager(uart)
 
@@ -1370,11 +1180,11 @@ for servo_id, info in servo_monitor_data.items():
 
 
 
-## 15.异步命令
+## 14. 异步命令
 
 > 注：**仅适用于无刷磁编码舵机V316及之后的版本**
 
-### API-`begin_async`
+### 14.1 API-`begin_async`
 
 开始异步指令，对下一个接收到的指令进行缓存，仅支持角度指令。
 
@@ -1394,7 +1204,7 @@ def begin_async(self):
 
 
 
-### API-`end_async`
+### 14.2 API-`end_async`
 
 结束异步指令，立即执行缓存指令。若参数 cancel 不为0，則清除缓存缓存。
 
@@ -1412,7 +1222,7 @@ def end_async(self,cancel=0):
 
 - 无
 
-### 例程源码
+### 14.3 例程源码
 
 `example/async_mode`
 
@@ -1443,8 +1253,8 @@ SERVO_BAUDRATE = 115200			# 舵机的波特率 请根据实际波特率进行修
 SERVO_ID = 0       #舵机ID
 # 初始化串口
 uart = serial.Serial(port=SERVO_PORT_NAME, baudrate=SERVO_BAUDRATE,\
-					 parity=serial.PARITY_NONE, stopbits=1,\
-					 bytesize=8,timeout=0)
+                     parity=serial.PARITY_NONE, stopbits=1,\
+                     bytesize=8,timeout=0)
 # 初始化舵机管理器
 uservo = UartServoManager(uart, is_debug=True)
 uservo.begin_async()   #  开始异步命令
@@ -1457,11 +1267,11 @@ uservo.end_async(0)    #  结束异步命令    0:執行； 1:取消
 
 
 
-## 16.数据监控
+## 15. 数据监控
 
 > 注：**仅适用于无刷磁编码舵机V316及之后的版本**
 
-### API-`query_servo_monitor`
+### 15.1 API-`query_servo_monitor`
 
 获取舵机数据。
 
@@ -1485,7 +1295,7 @@ def query_servo_monitor(self,servo_id=0):
 - `angle`：舵机角度(单圈/多圈）
 - `turn`：圈数
 
-### 例程源码
+### 15.2 例程源码
 
 `example/servo_monitor`
 
@@ -1515,8 +1325,8 @@ servo_id = 0                    # 监控的舵机id号
 
 # 初始化串口
 uart = serial.Serial(port=SERVO_PORT_NAME, baudrate=SERVO_BAUDRATE,\
-					 parity=serial.PARITY_NONE, stopbits=1,\
-					 bytesize=8,timeout=0)
+                     parity=serial.PARITY_NONE, stopbits=1,\
+                     bytesize=8,timeout=0)
 # 初始化舵机管理器
 uservo = UartServoManager(uart, is_debug=True)
 servo_info = uservo.query_servo_monitor(servo_id=0)
@@ -1529,11 +1339,11 @@ print("舵机电压: {:.2f}V, 电流: {:.2f}A, 功率: {:.2f}W, 温度: {:.2f}°
 
 
 
-## 17.控制模式停止指令
+## 16. 控制模式停止指令
 
 > 注：**仅适用于无刷磁编码舵机V316及之后的版本**
 
-### API-`stop_on_control_mode`
+### 16.1 API-`stop_on_control_mode`
 
 使舵机停止后保持不同状态模式。
 
@@ -1553,7 +1363,7 @@ def stop_on_control_mode(self,servo_id, method, power):
 
 - 无
 
-### 例程源码
+### 16.2 例程源码
 
 `example/stop_on_control_mode`
 
@@ -1598,7 +1408,7 @@ uservo.stop_on_control_mode(servo_id, method=0x12, power=500)
 
 ***注：ADC转换为摄氏度值公式***
 
-![image-20210421141916211](images/ZfqjeCzH3tWD2gw.png)
+![ADC转换为摄氏度值公式](./images/ZfqjeCzH3tWD2gw.png)
 
 | 温度(℃) | ADC  | 温度(℃) | ADC  | 温度(℃) | ADC  |
 | ------- | ---- | ------- | ---- | ------- | ---- |
