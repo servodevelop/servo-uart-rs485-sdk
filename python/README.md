@@ -26,6 +26,7 @@
 本文例程、API下载。
 
 - Python_SDK下载链接：[SDK for Python](https://fashionrobo.com/downloadcenter/)
+- 库安装： `pip install fashionstar-uart-sdk`
 
 ### 1.5 图例
 
@@ -60,9 +61,8 @@
 或者使用的时候，将`uservo.py`所在的文件夹添加到系统路径里面， 相对路径/绝对路径都可以。
 
 ```python
-# 添加uservo.py的系统路径
-import sys
-sys.path.append("../../src")
+# 直接导入一个已安装好的库
+import fashionstar_uart_sdk as uservo
 ```
 
 ### 3.3 依赖导入
