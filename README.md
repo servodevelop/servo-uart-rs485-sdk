@@ -1,36 +1,38 @@
 # servo-uart-rs485-sdk
 
+[中文](README.zh.md)
 
+## Ecosystem
 
-## 更新说明 
+servo-uart-rs485-sdk is the UART/RS485 servo SDK component of the Star Arm 102 ecosystem, providing serial-bus control examples and tools for Fashion Star servos used in robotic arm development.
 
-| 时间     | 版本说明                 |
-| -------- | ------------------------ |
-| 25/07/02 | 建立仓库，与官网版本一致 |
-| 25/07/04 | 同步文档                 |
-| 25/07/15 | 更新ROS2 SDK             |
-| 25/07/22 | 更新PC上位机             |
-| 25/09/11 | 更新指令计算表格         |
+- 🔗 [Star Arm 102 Series Hub](https://fashionstar.com.hk/robot-arm/star-arm-102/)
+- 🐙 [Main Repo: Star-Arm-102](https://github.com/servodevelop/Star-Arm-102)
 
+## Release Notes
 
+| Date | Version notes |
+| --- | --- |
+| 25/07/02 | Repository created; matches the version on the official website. |
+| 25/07/04 | Documentation synchronized. |
+| 25/07/15 | ROS 2 SDK updated. |
+| 25/07/22 | PC control software updated. |
+| 25/09/11 | Command calculation spreadsheet updated. |
 
-### 仓库说明
+### Repository Overview
 
-该仓库包括华馨京科技 uart&rs485 系列舵机的SDK例程。
+This repository contains SDK examples for Fashion Star's UART and RS485 servo series.
 
-通信协议以及更多资料请参考： [Fashion Star Wiki](https://wiki.fashionrobo.com/)
+For the communication protocol and additional resources, see the [Fashion Star Wiki](https://wiki.fashionrobo.com/).
 
-
-
-| 文件夹       | 描述                                                       |
-| ------------ | ---------------------------------------------------------- |
-| PC-Software | Develop-US：PC上位机<br>Serial Port Debugger：串口调试软件 |
-| STM32F103    | STM32F103 SDK（HAL库&标准库）                              |
-| STM32F407    | STM32F407 SDK（HAL库&标准库）                              |
-| cpp          | C++ SDK                                                    |
-| CSharp       | C# SDK                                                     |
-| python       | python SDK                                                 |
-| micro-python | micro-python SDK                                           |
-| arduino      | arduino SDK                                                |
-| ROS2         | ROS2 python SDK                                            |
-
+| Folder | Description |
+| --- | --- |
+| PC-Software | Develop-US: PC control software; Serial Port Debugger: serial-port debugging software |
+| STM32F103 | STM32F103 SDK (HAL and Standard Peripheral libraries) |
+| STM32F407 | STM32F407 SDK (HAL and Standard Peripheral libraries) |
+| C++ | C++ SDK |
+| C# | C# SDK |
+| python | Python SDK |
+| micro-python | MicroPython SDK |
+| arduino | Arduino SDK |
+| ros2 | ROS 2 Python SDK |
